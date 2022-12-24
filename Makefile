@@ -3,7 +3,6 @@ PROJECT_NAME     := blinky_pca10059_mbr
 TARGETS          := nrf52840_xxaa
 OUTPUT_DIRECTORY := _build
 
-SDK_ROOT := $(nativeBuildInputs)/share/nRF5_SDK
 PROJ_DIR := .
 
 $(OUTPUT_DIRECTORY)/nrf52840_xxaa.out: \

@@ -7,7 +7,11 @@
       let
         pkgs = import nixpkgs {
           inherit system;
-          crossSystem = nixpkgs.lib.systems.examples.arm-embedded;
+          ## This won't link, apparently the gcc-arm-embedded is a different fork?
+          #crossSystem = {
+          #  config = "arm-none-eabi";
+          #  libc = "newlib-nano";
+          #};
           config = {
             allowUnfree = true;
           };
@@ -16,7 +20,10 @@
         devShells.default = pkgs.mkShell {
           nativeBuildInputs = with pkgs; [
             nrf5-sdk
+            gcc-arm-embedded
           ];
+
+          SDK_ROOT = "${pkgs.nrf5-sdk}/share/nRF5_SDK";
         };
       });
 }
