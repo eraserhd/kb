@@ -16,11 +16,13 @@
             allowUnfree = true;
           };
         };
+
       in {
         devShells.default = pkgs.mkShell {
           nativeBuildInputs = with pkgs; [
-            nrf5-sdk
+            elf2uf2-rs
             gcc-arm-embedded
+            nrf5-sdk
           ];
 
           SDK_ROOT = "${pkgs.nrf5-sdk}/share/nRF5_SDK";
