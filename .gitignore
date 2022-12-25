@@ -1,3 +1,4 @@
 /.direnv
 *.o
 /_build
+*.elf
