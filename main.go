@@ -56,15 +56,15 @@ func main() {
 	spi := machine.SPI0
 	spi.Configure(machine.SPIConfig{
 		Frequency: 125000,
-		SCK:       machine.P0_17, // SS
-		SDO:       machine.P0_06, // MI
-		SDI:       machine.P0_08, // MO
+		SCK:       machine.P0_17, // SC
+		SDO:       machine.P0_08, // MO
+		SDI:       machine.P0_06, // MI
 		LSBFirst:  false,
 		Mode:      3,
 	})
 
-	ssPin := machine.P0_20
-	ssPin.Configure(machine.PinConfig{Mode: machine.PinOutput})
+	cs := machine.P0_20
+	cs.Configure(machine.PinConfig{Mode: machine.PinOutput})
 
 	led := machine.LED
 	led.Configure(machine.PinConfig{Mode: machine.PinOutput})
@@ -72,7 +72,7 @@ func main() {
 
 	tb := &Trackball{
 		spi: spi,
-		cs:  ssPin,
+		cs:  cs,
 	}
 	if err := tb.writeRegister(Power_Up_Reset, 0x5a); err != nil {
 		led.High()
