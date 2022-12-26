@@ -21,6 +21,9 @@
         devShells.default = pkgs.mkShell {
           nativeBuildInputs = with pkgs; [
             tinygo
+
+            usbutils
+            minicom
           ];
         };
       });
