@@ -16,38 +16,38 @@ const (
 )
 
 type Trackball struct {
-	spiBus      machine.SPI
-	slaveSelect machine.Pin
+	spi machine.SPI
+	cs  machine.Pin
 }
 
 func (tb *Trackball) writeRegister(reg, value byte) error {
-	tb.slaveSelect.Low()
-	_, err := tb.spiBus.Transfer(reg | 0x80)
+	tb.cs.Low()
+	_, err := tb.spi.Transfer(reg | 0x80)
 	if err != nil {
 		return err
 	}
-	_, err = tb.spiBus.Transfer(value)
+	_, err = tb.spi.Transfer(value)
 	if err != nil {
 		return err
 	}
 	time.Sleep(20 * time.Microsecond)
-	tb.slaveSelect.High()
+	tb.cs.High()
 	time.Sleep(100 * time.Microsecond)
 	return nil
 }
 
 func (tb *Trackball) readRegister(reg byte) (byte, error) {
-	tb.slaveSelect.Low()
-	_, err := tb.spiBus.Transfer(reg & 0x7f)
+	tb.cs.Low()
+	_, err := tb.spi.Transfer(reg & 0x7f)
 	if err != nil {
 		return 0, err
 	}
-	result, err := tb.spiBus.Transfer(0)
+	result, err := tb.spi.Transfer(0)
 	if err != nil {
 		return 0, err
 	}
 	time.Sleep(20 * time.Microsecond)
-	tb.slaveSelect.High()
+	tb.cs.High()
 	time.Sleep(100 * time.Microsecond)
 	return result, nil
 }
@@ -71,8 +71,8 @@ func main() {
 	led.Low()
 
 	tb := &Trackball{
-		spiBus:      spi,
-		slaveSelect: ssPin,
+		spi: spi,
+		cs:  ssPin,
 	}
 	if err := tb.writeRegister(Power_Up_Reset, 0x5a); err != nil {
 		led.High()
