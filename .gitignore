@@ -1,5 +1,5 @@
 /.direnv
 *.o
-/_build
 *.elf
+/_build
 /mnt

@@ -20,7 +20,8 @@
       in {
         devShells.default = pkgs.mkShell {
           nativeBuildInputs = with pkgs; [
-            tinygo
+            gcc-arm-embedded
+            nrf5-sdk
 
             usbutils
             minicom
