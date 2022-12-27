@@ -17,6 +17,30 @@
           };
         };
 
+        bin2uf2 = pkgs.stdenv.mkDerivation rec {
+          pname = "bin2uf2";
+          version = "3.4.0";
+
+          src = pkgs.fetchFromGitHub {
+            owner = "microsoft";
+            repo = "uf2-samdx1";
+            rev = "v${version}";
+            sha256 = "b1/SnLsSK7uAwECDgJIOtD67M7TZ7NS0PFY6arCUW5I=";
+          };
+
+          dontBuild = true;
+          installPhase = ''
+            runHook preInstall
+
+            mkdir -p $out/bin
+            substitute scripts/bin2uf2.js $out/bin/bin2uf2.js \
+              --replace '/usr/bin/env node' '${pkgs.nodejs}/bin/node'
+            chmod +x $out/bin/bin2uf2.js
+
+            runHook postInstall
+          '';
+        };
+
       in {
         devShells.default = pkgs.mkShell {
           nativeBuildInputs = with pkgs; [
@@ -24,6 +48,8 @@
             nrf5-sdk
 
             usbutils
+            bin2uf2
+            #pkgs.python310Packages.adafruit-nrfutil
             minicom
           ];
 
