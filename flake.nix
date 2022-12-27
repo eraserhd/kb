@@ -26,6 +26,8 @@
             usbutils
             minicom
           ];
+
+          SDK_ROOT = "${pkgs.nrf5-sdk}/share/nRF5_SDK";
         };
       });
 }
