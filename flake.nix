@@ -17,15 +17,15 @@
           };
         };
 
-        bin2uf2 = pkgs.stdenv.mkDerivation rec {
-          pname = "bin2uf2";
-          version = "3.4.0";
+        uf2conv-py = pkgs.stdenv.mkDerivation rec {
+          pname = "uf2conv-py";
+          version = "3.2.0";
 
           src = pkgs.fetchFromGitHub {
-            owner = "microsoft";
-            repo = "uf2-samdx1";
-            rev = "v${version}";
-            sha256 = "b1/SnLsSK7uAwECDgJIOtD67M7TZ7NS0PFY6arCUW5I=";
+            owner = "zephyrproject-rtos";
+            repo = "zephyr";
+            rev = "zephyr-v${version}";
+            sha256 = "pNZgMd2zSVFCAoCG7LEV+o2wUYGr38b/EutszjEdDAc=";
           };
 
           dontBuild = true;
@@ -33,9 +33,9 @@
             runHook preInstall
 
             mkdir -p $out/bin
-            substitute scripts/bin2uf2.js $out/bin/bin2uf2.js \
-              --replace '/usr/bin/env node' '${pkgs.nodejs}/bin/node'
-            chmod +x $out/bin/bin2uf2.js
+            substitute scripts/build/uf2conv.py $out/bin/uf2conv.py \
+              --replace '/usr/bin/env python3' '${pkgs.python310}/bin/python3'
+            chmod +x $out/bin/uf2conv.py
 
             runHook postInstall
           '';
@@ -46,9 +46,9 @@
           nativeBuildInputs = with pkgs; [
             gcc-arm-embedded
             nrf5-sdk
+            uf2conv-py
 
             usbutils
-            bin2uf2
             #pkgs.python310Packages.adafruit-nrfutil
             minicom
           ];

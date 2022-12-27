@@ -131,22 +131,17 @@ include $(TEMPLATE_PATH)/Makefile.common
 
 $(foreach target, $(TARGETS), $(call define_target, $(target)))
 
-.PHONY: flash flash_mbr erase
+.PHONY: flash
 
-# Flash the program
-flash: default
-	@echo Flashing: $(OUTPUT_DIRECTORY)/nrf52840_xxaa.hex
-	nrfjprog -f nrf52 --program $(OUTPUT_DIRECTORY)/nrf52840_xxaa.hex --sectorerase
-	nrfjprog -f nrf52 --reset
+%.uf2: %.bin
+	uf2conv.py --convert --base 0x26000 --family NRF52 --output $@ $<
 
-# Flash softdevice
-flash_mbr:
-	@echo Flashing: mbr_nrf52_2.4.1_mbr.hex
-	nrfjprog -f nrf52 --program $(SDK_ROOT)/components/softdevice/mbr/hex/mbr_nrf52_2.4.1_mbr.hex --sectorerase
-	nrfjprog -f nrf52 --reset
-
-erase:
-	nrfjprog -f nrf52 --eraseall
+flash: $(OUTPUT_DIRECTORY)/nrf52840_xxaa.uf2
+	mkdir -p mnt
+	sudo mount /dev/sda ./mnt
+	sudo cp $(OUTPUT_DIRECTORY)/nrf52840_xxaa.uf2 ./mnt/firmware.uf2
+	sync
+	sudo umount ./mnt
 
 SDK_CONFIG_FILE := ../config/sdk_config.h
 CMSIS_CONFIG_TOOL := $(SDK_ROOT)/external_tools/cmsisconfig/CMSIS_Configuration_Wizard.jar
