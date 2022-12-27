@@ -125,12 +125,12 @@ $(foreach target, $(TARGETS), $(call define_target, $(target)))
 
 .PHONY: flash
 
-%.uf2: %.bin
-	uf2conv.py --convert --base 0x26000 --family NRF52 --output $@ $<
+%.uf2: %.hex
+	uf2conv.py --convert --family NRF52 --output $@ $<
 
 flash: $(OUTPUT_DIRECTORY)/nrf52840_xxaa.uf2
 	mkdir -p mnt
-	sudo mount /dev/sda ./mnt
+	sudo mount /dev/sdb ./mnt
 	sudo cp $(OUTPUT_DIRECTORY)/nrf52840_xxaa.uf2 ./mnt/firmware.uf2
 	sync
 	sudo umount ./mnt
