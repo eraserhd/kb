@@ -126,7 +126,7 @@ $(foreach target, $(TARGETS), $(call define_target, $(target)))
 .PHONY: flash
 
 %.uf2: %.hex
-	uf2conv.py --convert --family NRF52 --output $@ $<
+	uf2conv.py --convert --family 0xada52840 --output $@ $<
 
 flash: $(OUTPUT_DIRECTORY)/nrf52840_xxaa.uf2
 	mkdir -p mnt
