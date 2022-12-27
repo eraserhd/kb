@@ -1,18 +1,16 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include "nrf_delay.h"
-#include "boards.h"
+#include "nrf_gpio.h"
+
+#define LED NRF_GPIO_PIN_MAP(0,15)
 
 int main(void)
 {
-    bsp_board_init(BSP_INIT_LEDS);
-
+    nrf_gpio_cfg_output(LED);
     while (true)
     {
-        for (int i = 0; i < LEDS_NUMBER; i++)
-        {
-            bsp_board_led_invert(i);
-            nrf_delay_ms(2000);
-        }
+        nrf_gpio_pin_toggle(LED);
+        nrf_delay_ms(2000);
     }
 }
