@@ -49,7 +49,7 @@
             uf2conv-py
 
             usbutils
-            #pkgs.python310Packages.adafruit-nrfutil
+            pkgs.python310Packages.adafruit-nrfutil
             minicom
           ];
 
