@@ -358,6 +358,17 @@ int32_t pmw3389_read_reg8(nrfx_spi_t const* spi, uint8_t reg)
     return buf[1];
 }
 
+int pmw3389_write_reg8(nrfx_spi_t const* spi, uint8_t reg, uint8_t value)
+{
+    uint8_t tx[2] = {reg|0x80, value};
+    nrfx_spi_xfer_desc_t xfer = NRFX_SPI_XFER_TX(tx, 2);
+    if (NRFX_SUCCESS != nrfx_spi_xfer(spi, &xfer, 0))
+    {
+        return -1;
+    }
+    return 0;
+}
+
 int32_t pmw3389_read_reg16(nrfx_spi_t const* spi, uint8_t low, uint8_t high)
 {
     int low_part = 0, high_part = 0;
@@ -416,9 +427,7 @@ int main(void)
         return -1;
     }
 
-    static const uint8_t reset[] = {PMW3389_REG_POWER_UP_RESET, 0x5a};
-    nrfx_spi_xfer_desc_t xfer = NRFX_SPI_XFER_TX(reset, 2);
-    if (NRFX_SUCCESS != nrfx_spi_xfer(&spi, &xfer, 0))
+    if (-1 == pmw3389_write_reg8(&spi, PMW3389_REG_POWER_UP_RESET, 0x5a))
     {
         nrf_gpio_pin_set(LED);
         return -1;
@@ -438,6 +447,12 @@ int main(void)
         return -1;
     }
     if (-1 == pmw3389_read_reg16(&spi, PMW3389_REG_DELTA_Y_LOW, PMW3389_REG_DELTA_Y_HIGH))
+    {
+        nrf_gpio_pin_set(LED);
+        return -1;
+    }
+
+    if (-1 == pmw3389_upload_firmware(&spi))
     {
         nrf_gpio_pin_set(LED);
         return -1;
