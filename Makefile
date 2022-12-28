@@ -24,6 +24,12 @@ SRC_FILES += \
   $(SDK_ROOT)/components/libraries/ringbuf/nrf_ringbuf.c \
   $(SDK_ROOT)/components/libraries/strerror/nrf_strerror.c \
   $(SDK_ROOT)/modules/nrfx/soc/nrfx_atomic.c \
+  $(SDK_ROOT)/modules/nrfx/drivers/src/nrfx_gpiote.c \
+  $(SDK_ROOT)/modules/nrfx/drivers/src/prs/nrfx_prs.c \
+  $(SDK_ROOT)/modules/nrfx/drivers/src/nrfx_spi.c \
+  $(SDK_ROOT)/modules/nrfx/drivers/src/nrfx_spim.c \
+  $(SDK_ROOT)/modules/nrfx/drivers/src/nrfx_uart.c \
+  $(SDK_ROOT)/modules/nrfx/drivers/src/nrfx_uarte.c \
   main.c \
   $(SDK_ROOT)/modules/nrfx/mdk/system_nrf52840.c \
 
@@ -49,6 +55,7 @@ INC_FOLDERS += \
   $(SDK_ROOT)/components/drivers_nrf/nrf_soc_nosd \
   $(SDK_ROOT)/components/libraries/atomic \
   $(SDK_ROOT)/components/libraries/memobj \
+  $(SDK_ROOT)/modules/nrfx/drivers/include \
   $(SDK_ROOT)/external/fprintf \
   $(SDK_ROOT)/components/libraries/log/src \
 
@@ -60,14 +67,15 @@ OPT = -O3 -g3
 # Uncomment the line below to enable link time optimization
 #OPT += -flto
 
+CPPFLAGS	= -DSPI_ENABLED=1 -DSPI0_ENABLED=1 -DSPI0_USE_EASY_DMA=0 \
+		  -DBSP_DEFINES_ONLY \
+		  -DCONFIG_GPIO_AS_PINRESET \
+		  -DFLOAT_ABI_HARD \
+		  -DMBR_PRESENT \
+		  -DNRF52840_XXAA
+
 # C flags common to all targets
-CFLAGS += $(OPT)
-CFLAGS += -DBOARD_CUSTOM
-CFLAGS += -DBSP_DEFINES_ONLY
-CFLAGS += -DCONFIG_GPIO_AS_PINRESET
-CFLAGS += -DFLOAT_ABI_HARD
-CFLAGS += -DMBR_PRESENT
-CFLAGS += -DNRF52840_XXAA
+CFLAGS += $(OPT) $(CPPFLAGS)
 CFLAGS += -mcpu=cortex-m4
 CFLAGS += -mthumb -mabi=aapcs
 CFLAGS += -Wall -Werror
@@ -83,12 +91,7 @@ ASMFLAGS += -g3
 ASMFLAGS += -mcpu=cortex-m4
 ASMFLAGS += -mthumb -mabi=aapcs
 ASMFLAGS += -mfloat-abi=hard -mfpu=fpv4-sp-d16
-ASMFLAGS += -DBOARD_CUSTOM
-ASMFLAGS += -DBSP_DEFINES_ONLY
-ASMFLAGS += -DCONFIG_GPIO_AS_PINRESET
-ASMFLAGS += -DFLOAT_ABI_HARD
-ASMFLAGS += -DMBR_PRESENT
-ASMFLAGS += -DNRF52840_XXAA
+ASMFLAGS += $(CPPFLAGS)
 
 # Linker flags
 LDFLAGS += $(OPT)
