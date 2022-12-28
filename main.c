@@ -14,11 +14,6 @@
 #define PMW3389_REG_DELTA_Y_HIGH   0x06
 #define PMW3389_REG_POWER_UP_RESET 0x3A
 
-#define SPI_SCK    NRF_GPIO_PIN_MAP(0,17)
-#define SPI_SDO    NRF_GPIO_PIN_MAP(0,8)
-#define SPI_SDI    NRF_GPIO_PIN_MAP(0,6)
-#define PMW3389_CS NRF_GPIO_PIN_MAP(0,20)
-
 static const nrfx_spi_config_t spi_config = {
     .sck_pin = NRF_GPIO_PIN_MAP(0,17),
     .mosi_pin = NRF_GPIO_PIN_MAP(0,6),

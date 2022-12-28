@@ -131,7 +131,7 @@ $(foreach target, $(TARGETS), $(call define_target, $(target)))
 
 flash: $(OUTPUT_DIRECTORY)/nrf52840_xxaa.uf2
 	mkdir -p mnt
-	sudo mount /dev/sdb ./mnt
+	sudo mount /dev/sda ./mnt
 	sudo cp $(OUTPUT_DIRECTORY)/nrf52840_xxaa.uf2 ./mnt/firmware.uf2
 	sync
 	sudo umount ./mnt
