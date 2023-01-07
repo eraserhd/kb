@@ -83,6 +83,7 @@ thumb_plate_bl_rotation = 0.0;
 tbcj_inner_diameter = 42;
 tbcj_thickness = 2;
 tbcj_outer_diameter = 43;
+tbcj_ball_adjust = [-15, -60, -12];
 
 /* [Bottom Plate Screws] */
 
@@ -570,7 +571,7 @@ module case_walls() {
 module add_thumb_cluster() {
   corner = reduced_inner_cols > 0 ? cornerrow : lastrow;
   origin = let (pos = key_placement_matrix(1, corner) * [mount_width/2, -mount_height/2, 0, 1]) [pos.x, pos.y, pos.z];
-  ball_origin = [-15, -60, -12] + origin;
+  ball_origin = tbcj_ball_adjust + origin;
 
   // Matrices for the four thumb keys, inside to outside
   thumb_keys = [
