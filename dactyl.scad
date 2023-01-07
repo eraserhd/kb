@@ -82,7 +82,7 @@ thumb_plate_br_rotation = 0.0;
 thumb_plate_bl_rotation = 0.0;
 tbcj_inner_diameter = 42;
 tbcj_thickness = 2;
-tbcj_outer_diameter = 53;
+tbcj_outer_diameter = 43;
 
 /* [Bottom Plate Screws] */
 
