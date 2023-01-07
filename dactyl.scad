@@ -109,8 +109,11 @@ external_holder_width = 28.75;
 external_holder_xoffset = -5.0;
 external_holder_yoffset = -4.5;
 
+panel_mount_hole_bottom = 7;
 panel_mount_usb = true;
 panel_mount_usb_diameter = 15;
+panel_mount_reset = true;
+panel_mount_reset_diameter = 5.5;
 
 // =========================================================================================================
 
@@ -426,7 +429,7 @@ module bottom_hull(height = 0.001) {
 
 function wall_locate1(dx, dy) = [dx * wall_thickness, dy * wall_thickness, -1];
 function wall_locate2(dx, dy) = [dx * wall_x_offset, dy * wall_y_offset, -wall_z_offset];
-function wall_locate3(dx, dy, back) = back ?
+function wall_locate3(dx, dy, back=false) = back ?
   [
     dx * (wall_x_offset + wall_base_x_thickness),
     dy * (wall_y_offset + wall_base_back_thickness),
@@ -903,19 +906,28 @@ module add_controller() {
 // == panel mount holes ==
 
 module add_panel_mount_holes() {
-  if (panel_mount_usb) {
-    pos = matrix_transform(key_placement_matrix(0.5, 0), wall_locate3(0, 1));
-    actual_pos = [pos.x, pos.y, panel_mount_usb_diameter];
+  module panel_mount_hole(diameter, offset=0) {
+    pos = matrix_transform(key_placement_matrix(0, 0), wall_locate3(0, 1));
+    actual_pos = [pos.x+offset+diameter/2, pos.y, panel_mount_hole_bottom + diameter/2];
+    translate(actual_pos)
+      rotate([90, 0, 0])
+        cylinder(d=diameter, h=34, center=true);
+  }
 
+  module add_panel_mount_usb() {
     difference() {
       children();
-      translate(actual_pos)
-        rotate([90, 0, 0])
-          cylinder(d=panel_mount_usb_diameter, h=34, center=true);
+      if (panel_mount_usb) {
+        panel_mount_hole(diameter=panel_mount_usb_diameter, offset=1);
+      }
+      if (panel_mount_reset) {
+        panel_mount_hole(diameter=panel_mount_reset_diameter, offset=1+panel_mount_usb_diameter+3);
+      }
     }
-  } else {
-    children();
   }
+
+  add_panel_mount_usb()
+    children();
 }
 
 // == OLED ==
