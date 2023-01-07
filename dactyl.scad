@@ -111,9 +111,14 @@ external_holder_yoffset = -4.5;
 
 panel_mount_hole_bottom = 7;
 panel_mount_usb = true;
-panel_mount_usb_diameter = 15;
+panel_mount_usb_neck_diameter = 15;
+panel_mount_usb_neck_length = 9;
+panel_mount_usb_shoulder_diameter = 22;
+
 panel_mount_reset = true;
-panel_mount_reset_diameter = 5.5;
+panel_mount_reset_neck_diameter = 5.5;
+panel_mount_reset_neck_length = 2.75;
+panel_mount_reset_shoulder_diameter = 7.5;
 
 // =========================================================================================================
 
@@ -951,22 +956,38 @@ module add_controller() {
 // == panel mount holes ==
 
 module add_panel_mount_holes() {
-  module panel_mount_hole(diameter, offset=0) {
+  module panel_mount_hole(neck_diameter, neck_length, shoulder_diameter, offset=0) {
     pos = matrix_transform(key_placement_matrix(0, 0), wall_locate3(0, 1));
-    actual_pos = [pos.x+offset+diameter/2, pos.y, panel_mount_hole_bottom + diameter/2];
+    actual_pos = [pos.x+offset+neck_diameter/2, pos.y, panel_mount_hole_bottom + neck_diameter/2];
     translate(actual_pos)
       rotate([90, 0, 0])
-        cylinder(d=diameter, h=34, center=true);
+        translate([0, 0, -wall_thickness-3.5])
+        union() {
+          translate([0, 0, neck_length/2])
+            cylinder(d=neck_diameter, h=neck_length+0.1, center=true);
+          translate([0, 0, 20/2 + neck_length])
+            cylinder(d=shoulder_diameter, h=20, center=true);
+        }
   }
 
   module add_panel_mount_usb() {
     difference() {
       children();
       if (panel_mount_usb) {
-        panel_mount_hole(diameter=panel_mount_usb_diameter, offset=1);
+        panel_mount_hole(
+          neck_diameter=panel_mount_usb_neck_diameter,
+          neck_length=panel_mount_usb_neck_length,
+          shoulder_diameter=panel_mount_usb_shoulder_diameter,
+          offset=1
+        );
       }
       if (panel_mount_reset) {
-        panel_mount_hole(diameter=panel_mount_reset_diameter, offset=1+panel_mount_usb_diameter+3);
+        panel_mount_hole(
+          neck_diameter=panel_mount_reset_neck_diameter,
+          neck_length=panel_mount_reset_neck_length,
+          shoulder_diameter=panel_mount_reset_shoulder_diameter,
+          offset=1+panel_mount_usb_neck_diameter+3
+        );
       }
     }
   }
