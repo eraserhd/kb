@@ -82,8 +82,9 @@ thumb_plate_br_rotation = 0.0;
 thumb_plate_bl_rotation = 0.0;
 tbcj_inner_diameter = 42;
 tbcj_thickness = 2;
-tbcj_outer_diameter = 43;
-tbcj_ball_adjust = [-15, -60, -12];
+tbcj_outer_diameter = 42.5;
+tbcj_ball_adjust = [-18, -50, -16];
+tbcj_ball_socket_rotate = [0, 0, 0];
 
 /* [Bottom Plate Screws] */
 
@@ -572,6 +573,8 @@ module add_thumb_cluster() {
   corner = reduced_inner_cols > 0 ? cornerrow : lastrow;
   origin = let (pos = key_placement_matrix(1, corner) * [mount_width/2, -mount_height/2, 0, 1]) [pos.x, pos.y, pos.z];
   ball_origin = tbcj_ball_adjust + origin;
+  ball_socket_rotate = [deg2rad(tbcj_ball_socket_rotate.x), deg2rad(tbcj_ball_socket_rotate.y), deg2rad(tbcj_ball_socket_rotate.z)];
+  ball_placement_matrix = translate_matrix(ball_origin) * rotate_matrix(ball_socket_rotate);
 
   // Matrices for the four thumb keys, inside to outside
   thumb_keys = [
@@ -749,11 +752,11 @@ module add_thumb_cluster() {
     
     make_walls([
       [thumb_keys[0], -1, 0],
-      [translate_matrix(ball_origin), 0, -1],
-      [translate_matrix(ball_origin), 0, -1],
-      [translate_matrix(ball_origin), 0, -1],
-      [translate_matrix(ball_origin), 1, -1],
-      [translate_matrix(ball_origin), 1, 0],
+      [ball_placement_matrix, 0, -1],
+      [ball_placement_matrix, 0, -1],
+      [ball_placement_matrix, 0, -1],
+      [ball_placement_matrix, 1, -1],
+      [ball_placement_matrix, 1, 0],
       [key_placement_matrix(3, lastrow), 0, -1]
     ]) {
       web_post_bl();
@@ -767,7 +770,7 @@ module add_thumb_cluster() {
   }
 
   module tbcj_place() {
-    translate(ball_origin) children();
+    multmatrix(ball_placement_matrix) children();
   }
   module tbcj_thumb() {
     tbcj_thumb_layout() single_plate();
@@ -783,7 +786,7 @@ module add_thumb_cluster() {
   }
 
   children();
-  add_trackball_socket(ball_origin)
+  add_trackball_socket(ball_placement_matrix * rotate_matrix([0,0,deg2rad(90)]))
     thumb_shape();
 }
 

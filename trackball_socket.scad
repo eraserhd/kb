@@ -1,5 +1,5 @@
 module add_trackball_socket(
-    position,
+    placement_matrix,
     trackball_diameter = 34,
     trackball_clearance = 1,
     wall_thickness = 3,
@@ -134,7 +134,7 @@ module add_trackball_socket(
     difference() {
         union() {
             children();
-            translate(position) {
+            multmatrix(placement_matrix) {
                 trackball_housing();
                 place_bearings() bearing_housing();
                 sensor_bracket();
@@ -142,7 +142,7 @@ module add_trackball_socket(
                 translate([0, -sensor_screw_distance/2, 0]) heat_set_insert_housing();
             }
         }
-        translate(position) {
+        multmatrix(placement_matrix) {
             trackball_cutout();
             place_bearings() bearing_cutout();
             sensor_bracket_cutout();
