@@ -96,7 +96,7 @@ screw_insert_outer_radius = 4.25;
 
 /* [Display] */
 
-oled_mount_type = "CLIP"; // [UNDERCUT, SLIDING, CLIP]
+oled_mount_type = "NONE"; // [NONE, CLIP]
 oled_center_row = 1.25;
 oled_translation_offset = [0, 0, 4];
 oled_rotation_offset = [0, 0, 0];
@@ -190,6 +190,51 @@ mount_height = keyswitch_height + 2 * plate_rim;
 mount_thickness = plate_thickness;
 
 oled_configurations = [
+  ["NONE",
+   function(name)
+     let (
+       left_wall_x_offset = 24.0,
+
+       fix_point = function(p) [p.x, p.y, p.z],
+       base_pt1 = fix_point(key_placement_matrix(0, oled_center_row-1) * [-mount_width/2, mount_height/2, 0, 1]),
+       base_pt2 = fix_point(key_placement_matrix(0, oled_center_row+1) * [-mount_width/2, mount_height/2, 0, 1]),
+       base_pt0 = fix_point(key_placement_matrix(0, oled_center_row)   * [-mount_width/2, mount_height/2, 0, 1]),
+
+       mount_location_part = (base_pt1 + base_pt2)/2 + [-left_wall_x_offset/2, 0, 0] + oled_translation_offset,
+       mount_location_xyz = [mount_location_part.x, mount_location_part.y, (mount_location_part.z + base_pt0[2])/2],
+
+       angle_x = atan2(base_pt1[2] - base_pt2[2], base_pt1[1] - base_pt2[1]),
+       angle_z = atan2(base_pt1[0] - base_pt2[0], base_pt1[1] - base_pt2[1]),
+       mount_rotation_xyz = [angle_x, 0, -angle_z] + oled_rotation_offset
+     )
+     name == "mount_width" ? 12.5 :
+     name == "mount_height" ? 39.0 :
+     name == "mount_rim" ? 2.0 :
+     name == "mount_depth" ? 7.0 :
+     name == "mount_cut_depth" ? 20.0 :
+     name == "mount_location_xyz" ? mount_location_xyz : //[ -78.0, 20.0, 42.0 ]
+     name == "mount_rotation_xyz" ? mount_rotation_xyz : //[ 12.0, 0.0, -6.0 ] :
+     name == "left_wall_x_offset" ? left_wall_x_offset :
+     name == "left_wall_z_offset" ? 0.0 :
+     name == "left_wall_lower_y_offset" ? 12.0 :
+     name == "left_wall_lower_z_offset" ? 5.0 :
+     name == "thickness" ? 4.2 :
+     name == "mount_bezel_thickness" ? 3.5 :
+     name == "mount_bezel_chamfer" ? 2.0 :
+     name == "mount_connector_hole" ? 6.0 :
+     name == "screen_start_from_conn_end" ? 6.5 :
+     name == "screen_length" ? 24.5 :
+     name == "screen_width" ? 10.5 :
+     name == "clip_thickness" ? 1.5 :
+     name == "clip_width" ? 6.0 :
+     name == "clip_overhang" ? 1.0 :
+     name == "clip_extension" ? 5.0 :
+     name == "clip_width_clearance" ? 0.5 :
+     name == "clip_undercut" ? 0.5 :
+     name == "clip_undercut_thickness" ? 2.5 :
+     name == "clip_y_gap" ? 0.2 :
+     name == "clip_z_gap" ? 0.2 :
+     assert(false, str("Unknown name ", name))],
   ["CLIP",
    function(name)
      let (
@@ -993,8 +1038,13 @@ module add_oled_clip_mount() {
 }
 
 module add_oled() {
-  add_oled_clip_mount() children();
-  assert(oled_mount_type == "CLIP", "Only CLIP is supported currently.");
+  if (oled_mount_type == "NONE") {
+    children();
+  } else if (oled_mount_type == "CLIP") {
+    add_oled_clip_mount() children();
+  } else {
+    assert(false, "Only NONE, CLIP are supported currently.");
+  }
 }
 
 // == model ==
