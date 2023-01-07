@@ -103,11 +103,14 @@ oled_rotation_offset = [0, 0, 0];
 
 /* [Controller Mounting] */
 
-controller_mount_type = "EXTERNAL"; // [EXTERNAL]
+controller_mount_type = "NONE"; // [NONE, EXTERNAL]
 external_holder_height = 12.5;
 external_holder_width = 28.75;
 external_holder_xoffset = -5.0;
 external_holder_yoffset = -4.5;
+
+panel_mount_usb = true;
+panel_mount_usb_diameter = 15;
 
 // =========================================================================================================
 
@@ -890,8 +893,28 @@ module add_controller() {
       children();
       external_mount_hole();
     }
+  } else if (controller_mount_type == "NONE") {
+    children();
   } else {
     assert(false, str("Unknown controller mount type ", controller_mount_type));
+  }
+}
+
+// == panel mount holes ==
+
+module add_panel_mount_holes() {
+  if (panel_mount_usb) {
+    pos = matrix_transform(key_placement_matrix(0.5, 0), wall_locate3(0, 1));
+    actual_pos = [pos.x, pos.y, panel_mount_usb_diameter];
+
+    difference() {
+      children();
+      translate(actual_pos)
+        rotate([90, 0, 0])
+          cylinder(d=panel_mount_usb_diameter, h=34, center=true);
+    }
+  } else {
+    children();
   }
 }
 
@@ -974,6 +997,7 @@ module cut_off_bottom() {
 module model_side() {
   cut_off_bottom()
     add_thumb_cluster()
+    add_panel_mount_holes()
     add_controller()
     add_key_holes()
     add_oled()
