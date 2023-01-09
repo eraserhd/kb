@@ -83,7 +83,7 @@ thumb_plate_bl_rotation = 0.0;
 tbcj_inner_diameter = 42;
 tbcj_thickness = 2;
 tbcj_outer_diameter = 42.5;
-tbcj_ball_adjust = [-18, -50, -16];
+tbcj_ball_adjust = [-18, -50, -13];
 tbcj_ball_socket_rotate = [0, 0, 0];
 
 /* [Bottom Plate Screws] */
