@@ -169,6 +169,11 @@ module triangle_hulls() {
   }
 }
 
+module cylinder_hole(diameter, height, fn, center=false) {
+  fudge = 1/cos(180/fn);
+  cylinder(h=height, d=diameter*fudge, center=center, $fn=fn);
+}
+
 plate_styles = [
   ["HOLE",        hole_keyswitch_height,     hole_keyswitch_width],
   ["NUB",         nub_keyswitch_height,      nub_keyswitch_width],
@@ -964,9 +969,9 @@ module add_panel_mount_holes() {
         translate([0, 0, -wall_thickness-3.5])
         union() {
           translate([0, 0, neck_length/2])
-            cylinder(d=neck_diameter, h=neck_length+0.1, center=true);
+            cylinder_hole(diameter=neck_diameter, height=neck_length+0.1, fn=20, center=true);
           translate([0, 0, 20/2 + neck_length])
-            cylinder(d=shoulder_diameter, h=20, center=true);
+            cylinder_hole(diameter=shoulder_diameter, height=20, fn=20, center=true);
         }
   }
 
