@@ -114,6 +114,7 @@ panel_mount_usb = true;
 panel_mount_usb_neck_diameter = 15;
 panel_mount_usb_neck_length = 9;
 panel_mount_usb_shoulder_diameter = 22;
+panel_mount_usb_flat_edge = 0.8;
 
 panel_mount_reset = true;
 panel_mount_reset_neck_diameter = 5.5;
@@ -961,15 +962,21 @@ module add_controller() {
 // == panel mount holes ==
 
 module add_panel_mount_holes() {
-  module panel_mount_hole(neck_diameter, neck_length, shoulder_diameter, offset=0) {
+  module panel_mount_hole(neck_diameter, neck_length, shoulder_diameter, flat_edge=0, offset=0) {
     pos = matrix_transform(key_placement_matrix(0, 0), wall_locate3(0, 1));
     actual_pos = [pos.x+offset+neck_diameter/2, pos.y, panel_mount_hole_bottom + neck_diameter/2];
     translate(actual_pos)
       rotate([90, 0, 0])
         translate([0, 0, -wall_thickness-3.5])
         union() {
-          translate([0, 0, neck_length/2])
-            cylinder_hole(diameter=neck_diameter, height=neck_length+0.1, fn=20, center=true);
+          difference() {
+            translate([0, 0, neck_length/2])
+              cylinder_hole(diameter=neck_diameter, height=neck_length+0.1, fn=20, center=true);
+            if (flat_edge > 0) {
+              translate([-(neck_diameter - flat_edge), 0, neck_length/2])
+                cube([neck_diameter, neck_diameter, neck_length+0.1], center=true);
+            }
+          }
           translate([0, 0, 20/2 + neck_length])
             cylinder_hole(diameter=shoulder_diameter, height=20, fn=20, center=true);
         }
@@ -983,6 +990,7 @@ module add_panel_mount_holes() {
           neck_diameter=panel_mount_usb_neck_diameter,
           neck_length=panel_mount_usb_neck_length,
           shoulder_diameter=panel_mount_usb_shoulder_diameter,
+          flat_edge=panel_mount_usb_flat_edge,
           offset=1
         );
       }
