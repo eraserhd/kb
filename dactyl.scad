@@ -121,6 +121,11 @@ panel_mount_reset_neck_diameter = 5.5;
 panel_mount_reset_neck_length = 2.25;
 panel_mount_reset_shoulder_diameter = 8.5;
 
+panel_mount_trrs = true;
+panel_mount_trrs_neck_diameter = 7.8;
+panel_mount_trrs_neck_length = 2.25;
+panel_mount_trrs_shoulder_diameter = 10;
+
 // =========================================================================================================
 
 use <trackball_socket.scad>;
@@ -170,9 +175,11 @@ module triangle_hulls() {
   }
 }
 
-module cylinder_hole(diameter, height, fn, center=false) {
+module cylinder_hole(diameter, height, fn, center=false, diameter1, diameter2) {
   fudge = 1/cos(180/fn);
-  cylinder(h=height, d=diameter*fudge, center=center, $fn=fn);
+  d1 = diameter1 ? diameter1*fudge : diameter*fudge;
+  d2 = diameter2 ? diameter2*fudge : diameter*fudge;
+  cylinder(h=height, d1=d1, d2=d2, center=center, $fn=fn);
 }
 
 plate_styles = [
@@ -962,10 +969,19 @@ module add_controller() {
 // == panel mount holes ==
 
 module add_panel_mount_holes() {
-  module panel_mount_hole(neck_diameter, neck_length, shoulder_diameter, flat_edge=0, offset=0) {
-    pos = matrix_transform(key_placement_matrix(0, 0), wall_locate3(0, 1));
-    actual_pos = [pos.x+neck_diameter/2, pos.y, panel_mount_hole_bottom + neck_diameter/2 + offset];
-    translate(actual_pos)
+  back_placement = function(neck_diameter, offset=0)
+    let (
+      pos = matrix_transform(key_placement_matrix(0, 0), wall_locate3(0, 1)),
+      actual_pos = [pos.x+neck_diameter/2, pos.y, panel_mount_hole_bottom + neck_diameter/2 + offset]
+    )
+    translate_matrix(actual_pos);
+    
+  side_placement = inner_wall_placement_matrix(0, -1) *
+    translate_matrix([0.5,5,-35]) *
+    rotate_z_matrix(deg2rad(70));
+
+  module panel_mount_hole(place, neck_diameter, neck_length, shoulder_diameter, flat_edge=0, offset=0) {
+    multmatrix(place)
       rotate([90, 0, 0])
         translate([0, 0, -wall_thickness-3.5])
         union() {
@@ -977,8 +993,16 @@ module add_panel_mount_holes() {
                 cube([neck_diameter, neck_diameter, neck_length+0.1], center=true);
             }
           }
-          translate([0, 0, 20/2 + neck_length])
-            cylinder_hole(diameter=shoulder_diameter, height=20, fn=20, center=true);
+          intersection() {
+            translate([0, 0, 5/2 + neck_length])
+              cylinder_hole(diameter1=shoulder_diameter, diameter2=shoulder_diameter + 1 + 5*2, height=5, fn=20, center=true);
+            union() {
+              translate([0, shoulder_diameter/2 + 10/2, 5/2 + neck_length])
+                cube([shoulder_diameter, shoulder_diameter + 10, 5], center=true);
+            translate([0, 0, 5/2 + neck_length])
+              cylinder_hole(diameter=shoulder_diameter, height=5, fn=20, center=true);
+            }
+          }
         }
   }
 
@@ -987,6 +1011,7 @@ module add_panel_mount_holes() {
       children();
       if (panel_mount_usb) {
         panel_mount_hole(
+          back_placement(neck_diameter=panel_mount_usb_neck_diameter+0.25),
           neck_diameter=panel_mount_usb_neck_diameter+0.25,
           neck_length=panel_mount_usb_neck_length,
           shoulder_diameter=panel_mount_usb_shoulder_diameter,
@@ -995,10 +1020,18 @@ module add_panel_mount_holes() {
       }
       if (panel_mount_reset) {
         panel_mount_hole(
+          back_placement(neck_diameter=panel_mount_reset_neck_diameter, offset=panel_mount_usb_shoulder_diameter),
           neck_diameter=panel_mount_reset_neck_diameter,
           neck_length=panel_mount_reset_neck_length,
-          shoulder_diameter=panel_mount_reset_shoulder_diameter,
-          offset=panel_mount_usb_shoulder_diameter
+          shoulder_diameter=panel_mount_reset_shoulder_diameter
+        );
+      }
+      if (panel_mount_trrs) {
+        panel_mount_hole(
+          side_placement,
+          neck_diameter=panel_mount_trrs_neck_diameter,
+          neck_length=panel_mount_trrs_neck_length,
+          shoulder_diameter=panel_mount_trrs_shoulder_diameter
         );
       }
     }
