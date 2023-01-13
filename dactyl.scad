@@ -1133,4 +1133,11 @@ module model_side() {
     case_walls();
 }
 
+//intersection() {
 model_side();
+//translate([-99,0,0])
+//    cube([25,60,29]);
+//}
+
+//Pi Pico
+//rotate([0,0,-15]) translate([-91,-15,23]) #cube([21,51,3]);
