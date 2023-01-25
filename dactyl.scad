@@ -96,7 +96,7 @@ screw_insert_outer_radius = 4.25;
 
 /* [Display] */
 
-oled_mount_type = "NONE"; // [NONE, CLIP]
+oled_mount_type = "DB15"; // [NONE, CLIP]
 oled_center_row = 1.25;
 oled_translation_offset = [0, 0, 4];
 oled_rotation_offset = [0, 0, 0];
@@ -110,18 +110,18 @@ external_holder_xoffset = -5.0;
 external_holder_yoffset = -4.5;
 
 panel_mount_hole_bottom = 7;
-panel_mount_usb = true;
+panel_mount_usb = false;
 panel_mount_usb_neck_diameter = 15;
 panel_mount_usb_neck_length = 9;
 panel_mount_usb_shoulder_diameter = 22;
 panel_mount_usb_flat_edge = 0.8;
 
-panel_mount_reset = true;
+panel_mount_reset = false;
 panel_mount_reset_neck_diameter = 5.5;
 panel_mount_reset_neck_length = 2.25;
 panel_mount_reset_shoulder_diameter = 8.5;
 
-panel_mount_trrs = true;
+panel_mount_trrs = false;
 panel_mount_trrs_neck_diameter = 7.8;
 panel_mount_trrs_neck_length = 2.25;
 panel_mount_trrs_shoulder_diameter = 10;
@@ -129,6 +129,7 @@ panel_mount_trrs_shoulder_diameter = 10;
 // =========================================================================================================
 
 use <trackball_socket.scad>;
+use <db_punchout.scad>;
 
 function deg2rad(d) = d*PI/180;
 function rad2deg(r) = r*180/PI;
@@ -274,6 +275,49 @@ oled_configurations = [
      name == "mount_height" ? 39.0 :
      name == "mount_rim" ? 2.0 :
      name == "mount_depth" ? 7.0 :
+     name == "mount_cut_depth" ? 20.0 :
+     name == "mount_location_xyz" ? mount_location_xyz : //[ -78.0, 20.0, 42.0 ]
+     name == "mount_rotation_xyz" ? mount_rotation_xyz : //[ 12.0, 0.0, -6.0 ] :
+     name == "left_wall_x_offset" ? left_wall_x_offset :
+     name == "left_wall_z_offset" ? 0.0 :
+     name == "left_wall_lower_y_offset" ? 12.0 :
+     name == "left_wall_lower_z_offset" ? 5.0 :
+     name == "thickness" ? 4.2 :
+     name == "mount_bezel_thickness" ? 3.5 :
+     name == "mount_bezel_chamfer" ? 2.0 :
+     name == "mount_connector_hole" ? 6.0 :
+     name == "screen_start_from_conn_end" ? 6.5 :
+     name == "screen_length" ? 24.5 :
+     name == "screen_width" ? 10.5 :
+     name == "clip_thickness" ? 1.5 :
+     name == "clip_width" ? 6.0 :
+     name == "clip_overhang" ? 1.0 :
+     name == "clip_extension" ? 5.0 :
+     name == "clip_width_clearance" ? 0.5 :
+     name == "clip_undercut" ? 0.5 :
+     name == "clip_undercut_thickness" ? 2.5 :
+     name == "clip_y_gap" ? 0.2 :
+     name == "clip_z_gap" ? 0.2 :
+     assert(false, str("Unknown name ", name))],
+  ["DB15",
+   function(name)
+     let (
+       left_wall_x_offset = 24.0,
+
+       fix_point = function(p) [p.x, p.y, p.z],
+       base_pt1 = fix_point(key_placement_matrix(0, oled_center_row-1) * [-mount_width/2, mount_height/2, 0, 1]),
+       base_pt2 = fix_point(key_placement_matrix(0, oled_center_row+1) * [-mount_width/2, mount_height/2, 0, 1]),
+       base_pt0 = fix_point(key_placement_matrix(0, oled_center_row)   * [-mount_width/2, mount_height/2, 0, 1]),
+
+       mount_location_part = (base_pt1 + base_pt2)/2 + [-left_wall_x_offset/2, 0, 0] + oled_translation_offset,
+       mount_location_xyz = [mount_location_part.x, mount_location_part.y, (mount_location_part.z + base_pt0[2])/2 + 2],
+
+       angle_x = atan2(base_pt1[2] - base_pt2[2], base_pt1[1] - base_pt2[1]),
+       angle_z = atan2(base_pt1[0] - base_pt2[0], base_pt1[1] - base_pt2[1]),
+       mount_rotation_xyz = [angle_x, 0, -angle_z] + oled_rotation_offset
+     )
+     name == "mount_rim" ? 2.0 :
+     name == "mount_depth" ? 2.5 :
      name == "mount_cut_depth" ? 20.0 :
      name == "mount_location_xyz" ? mount_location_xyz : //[ -78.0, 20.0, 42.0 ]
      name == "mount_rotation_xyz" ? mount_rotation_xyz : //[ 12.0, 0.0, -6.0 ] :
@@ -1103,13 +1147,47 @@ module add_oled_clip_mount() {
   }
 }
 
+module add_db15_hole() {
+  border = 3;
+  db15_width = 10.6;
+  db15_mount_hole_distance = 33;
+  db15_mount_hole_diameter = 4.2;
+  mount_ext_width = 13 + border;
+  mount_ext_height = 39 + 2*border;
+  module place_oled() {
+    translate(oled("mount_location_xyz"))
+      rotate(oled("mount_rotation_xyz"))
+        children();
+  }
+  module hole() {
+    place_oled() cube([mount_ext_width, mount_ext_height, oled("mount_cut_depth") + 0.01], center=true);
+  }
+
+  difference() {
+    children();
+    hole();
+  }
+  place_oled() {
+    difference() {
+      cube([
+        mount_ext_width,
+        mount_ext_height,
+        oled("mount_depth")
+      ], center=true);
+      cutoutDB("DB15", "SLOT", "Yes", "No");
+    }
+  }
+}
+
 module add_oled() {
   if (oled_mount_type == "NONE") {
     children();
   } else if (oled_mount_type == "CLIP") {
     add_oled_clip_mount() children();
+  } else if (oled_mount_type == "DB15") {
+    add_db15_hole() children();
   } else {
-    assert(false, "Only NONE, CLIP are supported currently.");
+    assert(false, "Only NONE, CLIP, and DB15 are supported currently.");
   }
 }
 
