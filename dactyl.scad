@@ -129,7 +129,7 @@ panel_mount_trrs_shoulder_diameter = 10;
 // =========================================================================================================
 
 use <trackball_socket.scad>;
-use <db_punchout.scad>;
+use <dsub.scad>;
 
 function deg2rad(d) = d*PI/180;
 function rad2deg(r) = r*180/PI;
@@ -1174,7 +1174,9 @@ module add_db15_hole() {
         mount_ext_height,
         oled("mount_depth")
       ], center=true);
-      cutoutDB("DB15", "SLOT", "Yes", "No");
+      //cutoutDB("DB15", "SLOT", "Yes", "No");
+      translate([-1.5, 0, -3])
+        dsub(1.1, 25.37, 20);
     }
   }
 }
