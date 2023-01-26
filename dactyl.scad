@@ -1131,16 +1131,17 @@ module add_panel_mount_holes() {
 
 // == OLED ==
 
+module place_oled() {
+  translate(oled("mount_location_xyz"))
+    rotate(oled("mount_rotation_xyz"))
+      children();
+}
+
 module add_oled_clip_mount() {
   mount_ext_width = oled("mount_width") + 2 * oled("mount_rim");
   mount_ext_height = oled("mount_height") + 2 * oled("clip_thickness")
           + 2 * oled("clip_undercut") + 2 * oled("clip_overhang") + 2 * oled("mount_rim");
-  
-  module place_oled() {
-    translate(oled("mount_location_xyz"))
-      rotate(oled("mount_rotation_xyz"))
-        children();
-  }
+
   module hole() {
     place_oled() cube([mount_ext_width, mount_ext_height, oled("mount_cut_depth") + 0.01], center=true);
   }
@@ -1192,11 +1193,6 @@ module add_oled_clip_mount() {
 }
 
 module add_db15_hole() {
-  module place_oled() {
-    translate(oled("mount_location_xyz"))
-      rotate(oled("mount_rotation_xyz"))
-        children();
-  }
   module hole() {
     place_oled()
       cube([
@@ -1224,11 +1220,6 @@ module add_db15_hole() {
 }
 
 module add_db15_db9_holes() {
-  module place_oled() {
-    translate(oled("mount_location_xyz"))
-      rotate(oled("mount_rotation_xyz"))
-        children();
-  }
   module hole() {
     place_oled()
       cube([
