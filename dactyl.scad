@@ -89,7 +89,7 @@ tbcj_ball_socket_rotate = [0, 0, 0];
 /* [Bottom Plate Screws] */
 
 // Position of screw inserts, relative to the case walls.
-screw_offset_type = "INTERIOR"; // [INTERIOR, EXTERIOR, ORIGINAL]
+screw_offset_type = "EXTERIOR"; // [INTERIOR, EXTERIOR, ORIGINAL]
 
 screw_insert_height = 3.8;
 screw_insert_outer_radius = 4.25;
@@ -1282,9 +1282,8 @@ module model_side() {
 
 //intersection() {
 model_side();
-//translate([-89,0,59])
-//    rotate([10, 0, 0])
-//      cube([35,60,29]);
+//place_oled()
+//      cube([31,45,4], center=true);
 //}
 
 //Pi Pico
