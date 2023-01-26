@@ -362,7 +362,7 @@ oled_configurations = [
   ["DB15-DB9",
    function(name)
      let (
-       left_wall_x_offset = 32.0,
+       left_wall_x_offset = 35.0,
 
        fix_point = function(p) [p.x, p.y, p.z],
        base_pt1 = fix_point(key_placement_matrix(0, oled_center_row-1) * [-mount_width/2, mount_height/2, 0, 1]),
