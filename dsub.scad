@@ -3,35 +3,22 @@
 //dp= depth, set to a size that can penetrate the panel you are using it with
 module dsub(sc,sz,dp){
     $fn=64;
-    
+
     cs=(sz/2)-2.6;
     cs2=(sz/2)-4.095;
     ns=(sz/2)+4.04;
-     translate([1.66,-ns,0]){
-    scale([sc,sc,sc])
-    cylinder(r=1.6,h=10);
-    }
-    translate([1.66,ns,0]){
-    scale([sc,sc,sc])
-    cylinder(r=1.6,h=10);
-    }
-    
-    scale([sc,sc,sc]){
-    
-    hull(){
-    translate([0,-cs,0]){
-    cylinder(r=2.6,h=10);
-    }
-    translate([0,cs,0]){
-    cylinder(r=2.6,h=10);
-    }
-    translate([3.28,-cs2,0]){
-    cylinder(r=2.6,h=10);
-    }
-    translate([3.28,cs2,0]){
-    cylinder(r=2.6,h=10);
-    }
-}
-}
-}
+    translate([1.66,-ns,0])
+        scale([sc,sc,sc])
+            cylinder(r=1.6,h=10);
+    translate([1.66,ns,0])
+        scale([sc,sc,sc])
+            cylinder(r=1.6,h=10);
 
+    scale([sc,sc,sc])
+    hull() {
+        translate([0,-cs,0]) cylinder(r=2.6,h=10);
+        translate([0,cs,0]) cylinder(r=2.6,h=10);
+        translate([3.28,-cs2,0]) cylinder(r=2.6,h=10);
+        translate([3.28,cs2,0]) cylinder(r=2.6,h=10);
+    }
+}
