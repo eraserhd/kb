@@ -1231,7 +1231,7 @@ module add_db15_db9_holes() {
       ], center=true);
       translate([-1.5 + (dbus_connector_plate_width/2), 0, -3])
         db15(1.15, 20);
-      translate([-1.5 - (dbus_connector_plate_width/2), -4.4, -3])
+      translate([-1.5 - (dbus_connector_plate_width/2), -db15_connector_plate_length/2 + db9_connector_plate_length/2, -3])
         db9(1.15, 20);
     }
   }
