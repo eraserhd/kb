@@ -1220,8 +1220,8 @@ module add_db15_hole() {
         oled("mount_ext_height"),
         oled("mount_depth")
       ], center=true);
-      translate([-1.5, 0, -3])
-        db15(1.15, 20);
+      translate([0, 0, -3])
+        db15();
     }
   }
 }
@@ -1238,10 +1238,10 @@ module add_db15_db9_holes() {
         oled("mount_ext_height"),
         oled("mount_depth")
       ], center=true);
-      translate([-1.5 + (dbus_connector_plate_width/2), 0, -3])
-        db15(1.15, 20);
-      translate([-1.5 - (dbus_connector_plate_width/2), -db15_connector_plate_length/2 + db9_connector_plate_length/2, -3])
-        db9(1.15, 20);
+      translate([dbus_connector_plate_width/2, 0, -3])
+        db15();
+      translate([-dbus_connector_plate_width/2, -db15_connector_plate_length/2 + db9_connector_plate_length/2, -3])
+        db9();
     }
   }
 }
