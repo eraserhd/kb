@@ -345,7 +345,7 @@ oled_configurations = [
   ["DB15-DB9",
    function(name)
      let (
-       left_wall_x_offset = 30.0,
+       left_wall_x_offset = 32.0,
 
        fix_point = function(p) [p.x, p.y, p.z],
        base_pt1 = fix_point(key_placement_matrix(0, oled_center_row-1) * [-mount_width/2, mount_height/2, 0, 1]),
@@ -353,11 +353,11 @@ oled_configurations = [
        base_pt0 = fix_point(key_placement_matrix(0, oled_center_row)   * [-mount_width/2, mount_height/2, 0, 1]),
 
        mount_location_part = (base_pt1 + base_pt2)/2 + [-left_wall_x_offset/2, 0, 0] + oled_translation_offset,
-       mount_location_xyz = [mount_location_part.x, mount_location_part.y, (mount_location_part.z + base_pt0[2])/2 + 2],
+       mount_location_xyz = [mount_location_part.x, mount_location_part.y, (mount_location_part.z + base_pt0[2])/2 + 1],
 
        angle_x = atan2(base_pt1[2] - base_pt2[2], base_pt1[1] - base_pt2[1]),
        angle_z = atan2(base_pt1[0] - base_pt2[0], base_pt1[1] - base_pt2[1]),
-       mount_rotation_xyz = [angle_x, 0, -angle_z] + oled_rotation_offset
+       mount_rotation_xyz = [angle_x, 5, -angle_z] + oled_rotation_offset
      )
      name == "mount_rim" ? 2.0 :
      name == "mount_depth" ? 1.8 :
