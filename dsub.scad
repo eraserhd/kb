@@ -8,9 +8,11 @@ module dsub(sc,sz,dp){
     cs2=(sz/2)-4.095;
     ns=(sz/2)+4.04;
      translate([1.66,-ns,0]){
+    scale([sc,sc,sc])
     cylinder(r=1.6,h=10);
     }
     translate([1.66,ns,0]){
+    scale([sc,sc,sc])
     cylinder(r=1.6,h=10);
     }
     

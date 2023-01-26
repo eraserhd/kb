@@ -317,7 +317,7 @@ oled_configurations = [
        mount_rotation_xyz = [angle_x, 0, -angle_z] + oled_rotation_offset
      )
      name == "mount_rim" ? 2.0 :
-     name == "mount_depth" ? 2.5 :
+     name == "mount_depth" ? 1.8 :
      name == "mount_cut_depth" ? 20.0 :
      name == "mount_location_xyz" ? mount_location_xyz : //[ -78.0, 20.0, 42.0 ]
      name == "mount_rotation_xyz" ? mount_rotation_xyz : //[ 12.0, 0.0, -6.0 ] :
@@ -1149,9 +1149,6 @@ module add_oled_clip_mount() {
 
 module add_db15_hole() {
   border = 3;
-  db15_width = 10.6;
-  db15_mount_hole_distance = 33;
-  db15_mount_hole_diameter = 4.2;
   mount_ext_width = 13 + border;
   mount_ext_height = 39 + 2*border;
   module place_oled() {
@@ -1174,9 +1171,8 @@ module add_db15_hole() {
         mount_ext_height,
         oled("mount_depth")
       ], center=true);
-      //cutoutDB("DB15", "SLOT", "Yes", "No");
       translate([-1.5, 0, -3])
-        dsub(1.1, 25.37, 20);
+        dsub(1.15, 25.37, 20);
     }
   }
 }
