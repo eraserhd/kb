@@ -96,7 +96,7 @@ screw_insert_outer_radius = 4.25;
 
 /* [Display] */
 
-oled_mount_type = "DB15-DB9"; // [NONE, CLIP]
+oled_mount_type = "DB15-DB9"; // [NONE, CLIP, DB15, DB15-DB9]
 oled_center_row = 1.25;
 oled_translation_offset = [0, 0, 4];
 oled_rotation_offset = [0, 0, 0];
@@ -319,9 +319,16 @@ oled_configurations = [
 
        angle_x = atan2(base_pt1[2] - base_pt2[2], base_pt1[1] - base_pt2[1]),
        angle_z = atan2(base_pt1[0] - base_pt2[0], base_pt1[1] - base_pt2[1]),
-       mount_rotation_xyz = [angle_x, 0, -angle_z] + oled_rotation_offset
+       mount_rotation_xyz = [angle_x, 5, -angle_z] + oled_rotation_offset,
+
+       mount_rim = 3.0,
+
+       mount_ext_width = dbus_connector_plate_width + 2*mount_rim,
+       mount_ext_height = db15_connector_plate_length + 2*mount_rim
      )
-     name == "mount_rim" ? 3.0 :
+     name == "mount_ext_width" ? mount_ext_width :
+     name == "mount_ext_height" ? mount_ext_height :
+     name == "mount_rim" ? mount_rim :
      name == "mount_depth" ? 1.8 :
      name == "mount_cut_depth" ? 20.0 :
      name == "mount_location_xyz" ? mount_location_xyz : //[ -78.0, 20.0, 42.0 ]
@@ -353,9 +360,16 @@ oled_configurations = [
 
        angle_x = atan2(base_pt1[2] - base_pt2[2], base_pt1[1] - base_pt2[1]),
        angle_z = atan2(base_pt1[0] - base_pt2[0], base_pt1[1] - base_pt2[1]),
-       mount_rotation_xyz = [angle_x, 5, -angle_z] + oled_rotation_offset
+       mount_rotation_xyz = [angle_x, 5, -angle_z] + oled_rotation_offset,
+       
+       mount_rim = 3.0,
+
+       mount_ext_width = 2*dbus_connector_plate_width + 2*mount_rim,
+       mount_ext_height = db15_connector_plate_length + 2*mount_rim
      )
-     name == "mount_rim" ? 3.0 :
+     name == "mount_ext_width" ? mount_ext_width :
+     name == "mount_ext_height" ? mount_ext_height :
+     name == "mount_rim" ? mount_rim :
      name == "mount_depth" ? 1.8 :
      name == "mount_cut_depth" ? 20.0 :
      name == "mount_location_xyz" ? mount_location_xyz : //[ -78.0, 20.0, 42.0 ]
@@ -1178,15 +1192,18 @@ module add_oled_clip_mount() {
 }
 
 module add_db15_hole() {
-  mount_ext_width = dbus_connector_plate_width + 2*oled("mount_rim");
-  mount_ext_height = db15_connector_plate_length + 2*oled("mount_rim");
   module place_oled() {
     translate(oled("mount_location_xyz"))
       rotate(oled("mount_rotation_xyz"))
         children();
   }
   module hole() {
-    place_oled() cube([mount_ext_width, mount_ext_height, oled("mount_cut_depth") + 0.01], center=true);
+    place_oled()
+      cube([
+        oled("mount_ext_width"),
+        oled("mount_ext_height"),
+        oled("mount_cut_depth") + 0.01
+      ], center=true);
   }
 
   difference() {
@@ -1196,8 +1213,8 @@ module add_db15_hole() {
   place_oled() {
     difference() {
       cube([
-        mount_ext_width,
-        mount_ext_height,
+        oled("mount_ext_width"),
+        oled("mount_ext_height"),
         oled("mount_depth")
       ], center=true);
       translate([-1.5, 0, -3])
@@ -1207,15 +1224,18 @@ module add_db15_hole() {
 }
 
 module add_db15_db9_holes() {
-  mount_ext_width = 2*dbus_connector_plate_width + 2*oled("mount_rim");
-  mount_ext_height = db15_connector_plate_length + 2*oled("mount_rim");
   module place_oled() {
     translate(oled("mount_location_xyz"))
       rotate(oled("mount_rotation_xyz"))
         children();
   }
   module hole() {
-    place_oled() cube([mount_ext_width, mount_ext_height, oled("mount_cut_depth") + 0.01], center=true);
+    place_oled()
+      cube([
+        oled("mount_ext_width"),
+        oled("mount_ext_height"),
+        oled("mount_cut_depth") + 0.01
+      ], center=true);
   }
 
   difference() {
@@ -1225,8 +1245,8 @@ module add_db15_db9_holes() {
   place_oled() {
     difference() {
       cube([
-        mount_ext_width,
-        mount_ext_height,
+        oled("mount_ext_width"),
+        oled("mount_ext_height"),
         oled("mount_depth")
       ], center=true);
       translate([-1.5 + (dbus_connector_plate_width/2), 0, -3])
