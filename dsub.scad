@@ -22,3 +22,10 @@ module dsub(sc,sz,dp){
         translate([3.28,cs2,0]) cylinder(r=2.6,h=10);
     }
 }
+
+module db9(scale, depth) {
+    dsub(scale, 17.04, depth);
+}
+module db15(scale, depth) {
+    dsub(scale, 25.37, depth);
+}
