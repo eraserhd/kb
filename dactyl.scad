@@ -126,6 +126,11 @@ panel_mount_trrs_neck_diameter = 7.8;
 panel_mount_trrs_neck_length = 2.25;
 panel_mount_trrs_shoulder_diameter = 10;
 
+/* [D-Sub Connectors] */
+dbus_connector_plate_width = 13;
+db9_connector_plate_length = 30.9;
+db15_connector_plate_length = 39.5;
+
 // =========================================================================================================
 
 use <trackball_socket.scad>;
@@ -1173,9 +1178,8 @@ module add_oled_clip_mount() {
 }
 
 module add_db15_hole() {
-  dbus_connector_plate_width = 13;
-  mount_ext_width = dbus_connector_plate_width + oled("mount_rim");
-  mount_ext_height = 39 + 2*oled("mount_rim");
+  mount_ext_width = dbus_connector_plate_width + 2*oled("mount_rim");
+  mount_ext_height = db15_connector_plate_length + 2*oled("mount_rim");
   module place_oled() {
     translate(oled("mount_location_xyz"))
       rotate(oled("mount_rotation_xyz"))
@@ -1203,9 +1207,8 @@ module add_db15_hole() {
 }
 
 module add_db15_db9_holes() {
-  dbus_connector_plate_width = 13;
-  mount_ext_width = 2*dbus_connector_plate_width + oled("mount_rim");
-  mount_ext_height = 39 + 2*oled("mount_rim");
+  mount_ext_width = 2*dbus_connector_plate_width + 2*oled("mount_rim");
+  mount_ext_height = db15_connector_plate_length + 2*oled("mount_rim");
   module place_oled() {
     translate(oled("mount_location_xyz"))
       rotate(oled("mount_rotation_xyz"))
