@@ -274,11 +274,25 @@ oled_configurations = [
 
        angle_x = atan2(base_pt1[2] - base_pt2[2], base_pt1[1] - base_pt2[1]),
        angle_z = atan2(base_pt1[0] - base_pt2[0], base_pt1[1] - base_pt2[1]),
-       mount_rotation_xyz = [angle_x, 0, -angle_z] + oled_rotation_offset
+       mount_rotation_xyz = [angle_x, 0, -angle_z] + oled_rotation_offset,
+       
+       mount_width = 12.5,
+       mount_height = 39.0,
+       mount_rim = 2.0,
+       
+       clip_thickness = 1.5,
+       clip_undercut = 0.5,
+       clip_overhang = 1.0,
+
+       mount_ext_width = mount_width + 2 * mount_rim,
+       mount_ext_height = mount_height + 2 * clip_thickness
+               + 2 * clip_undercut + 2 * clip_overhang + 2 * mount_rim
      )
-     name == "mount_width" ? 12.5 :
-     name == "mount_height" ? 39.0 :
-     name == "mount_rim" ? 2.0 :
+     name == "mount_ext_width" ? mount_ext_width :
+     name == "mount_ext_height" ? mount_ext_height :
+     name == "mount_width" ? mount_width :
+     name == "mount_height" ? mount_height :
+     name == "mount_rim" ? mount_rim :
      name == "mount_depth" ? 7.0 :
      name == "mount_cut_depth" ? 20.0 :
      name == "mount_location_xyz" ? mount_location_xyz : //[ -78.0, 20.0, 42.0 ]
@@ -294,12 +308,12 @@ oled_configurations = [
      name == "screen_start_from_conn_end" ? 6.5 :
      name == "screen_length" ? 24.5 :
      name == "screen_width" ? 10.5 :
-     name == "clip_thickness" ? 1.5 :
+     name == "clip_thickness" ? clip_thickness :
      name == "clip_width" ? 6.0 :
-     name == "clip_overhang" ? 1.0 :
+     name == "clip_overhang" ? clip_overhang :
      name == "clip_extension" ? 5.0 :
      name == "clip_width_clearance" ? 0.5 :
-     name == "clip_undercut" ? 0.5 :
+     name == "clip_undercut" ? clip_undercut :
      name == "clip_undercut_thickness" ? 2.5 :
      name == "clip_y_gap" ? 0.2 :
      name == "clip_z_gap" ? 0.2 :
@@ -1147,13 +1161,6 @@ module oled_mount_hole() {
 }
 
 module add_oled_clip_mount() {
-  mount_ext_width = oled("mount_width") + 2 * oled("mount_rim");
-  mount_ext_height = oled("mount_height") + 2 * oled("clip_thickness")
-          + 2 * oled("clip_undercut") + 2 * oled("clip_overhang") + 2 * oled("mount_rim");
-
-  module hole() {
-    place_oled() cube([mount_ext_width, mount_ext_height, oled("mount_cut_depth") + 0.01], center=true);
-  }
   module clip_undercut() {
     translate([0, 0, oled("clip_undercut_thickness")])
       cube([
@@ -1180,13 +1187,13 @@ module add_oled_clip_mount() {
 
   difference() {
     children();
-    hole();
+    oled_mount_hole();
   }
   place_oled() {
     difference() {
       cube([
-        mount_ext_width,
-        mount_ext_height,
+        oled("mount_ext_width"),
+        oled("mount_ext_height"),
         oled("mount_depth")
       ], center=true);
       cube([
