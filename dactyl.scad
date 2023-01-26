@@ -332,15 +332,6 @@ oled_configurations = [
      name == "screen_start_from_conn_end" ? 6.5 :
      name == "screen_length" ? 24.5 :
      name == "screen_width" ? 10.5 :
-     name == "clip_thickness" ? 1.5 :
-     name == "clip_width" ? 6.0 :
-     name == "clip_overhang" ? 1.0 :
-     name == "clip_extension" ? 5.0 :
-     name == "clip_width_clearance" ? 0.5 :
-     name == "clip_undercut" ? 0.5 :
-     name == "clip_undercut_thickness" ? 2.5 :
-     name == "clip_y_gap" ? 0.2 :
-     name == "clip_z_gap" ? 0.2 :
      assert(false, str("Unknown name ", name))],
   ["DB15-DB9",
    function(name)
@@ -375,15 +366,6 @@ oled_configurations = [
      name == "screen_start_from_conn_end" ? 6.5 :
      name == "screen_length" ? 24.5 :
      name == "screen_width" ? 10.5 :
-     name == "clip_thickness" ? 1.5 :
-     name == "clip_width" ? 6.0 :
-     name == "clip_overhang" ? 1.0 :
-     name == "clip_extension" ? 5.0 :
-     name == "clip_width_clearance" ? 0.5 :
-     name == "clip_undercut" ? 0.5 :
-     name == "clip_undercut_thickness" ? 2.5 :
-     name == "clip_y_gap" ? 0.2 :
-     name == "clip_z_gap" ? 0.2 :
      assert(false, str("Unknown name ", name))]
 ];
 
