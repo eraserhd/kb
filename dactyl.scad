@@ -1,3 +1,5 @@
+// Which half of the keyboard?
+Side = "LEFT"; // [LEFT, RIGHT]
 // Number of non-thumb rows
 Rows = 3;
 // Number of non-thumb columns
@@ -96,7 +98,7 @@ screw_insert_outer_radius = 4.25;
 
 /* [Display] */
 
-oled_mount_type = "DB15-DB9"; // [NONE, CLIP, DB15, DB15-DB9]
+oled_mount_type = "DB15"; // [NONE, CLIP, DB15, DB15-DB9]
 oled_center_row = 1.25;
 oled_translation_offset = [0, 0, 4];
 oled_rotation_offset = [0, 0, 0];
@@ -1208,6 +1210,14 @@ module add_oled_clip_mount() {
   }
 }
 
+module mirror_for_left() {
+  if (Side == "LEFT") {
+    mirror([1,0,0]) children();
+  } else {
+    children();
+  }
+}
+
 module add_db15_hole() {
   difference() {
     children();
@@ -1221,7 +1231,7 @@ module add_db15_hole() {
         oled("mount_depth")
       ], center=true);
       translate([0, 0, -3])
-        db15();
+        mirror_for_left() db15();
     }
   }
 }
@@ -1239,9 +1249,9 @@ module add_db15_db9_holes() {
         oled("mount_depth")
       ], center=true);
       translate([dbus_connector_plate_width/2, 0, -3])
-        db15();
+        mirror_for_left() db15();
       translate([-dbus_connector_plate_width/2, -db15_connector_plate_length/2 + db9_connector_plate_length/2, -3])
-        db9();
+        mirror_for_left() db9();
     }
   }
 }
@@ -1280,11 +1290,4 @@ module model_side() {
     case_walls();
 }
 
-//intersection() {
-model_side();
-//place_oled()
-//      cube([31,45,4], center=true);
-//}
-
-//Pi Pico
-//rotate([0,0,-15]) translate([-91,-15,23]) #cube([21,51,3]);
+mirror_for_left() model_side();
