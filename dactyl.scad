@@ -75,7 +75,7 @@ clip_undercut = 1.0;
 
 /* [Thumb Cluster] */
 
-thumb_style = "TRACKBALL_CJ"; // [TRACKBALL_CJ]
+thumb_style = "DEFAULT"; // [DEFAULT, TRACKBALL_CJ]
 thumb_plate_tr_rotation = 0.0;
 thumb_plate_tl_rotation = 0.0;
 thumb_plate_mr_rotation = 0.0;
@@ -742,7 +742,7 @@ module case_walls() {
 
 // == thumb cluster ==
 
-module add_thumb_cluster() {
+module add_trackball_cj_thumb_cluster() {
   corner = reduced_inner_cols > 0 ? cornerrow : lastrow;
   origin = let (pos = key_placement_matrix(1, corner) * [mount_width/2, -mount_height/2, 0, 1]) [pos.x, pos.y, pos.z];
   ball_origin = tbcj_ball_adjust + origin;
@@ -961,6 +961,188 @@ module add_thumb_cluster() {
   children();
   add_trackball_socket(ball_placement_matrix * rotate_matrix([0,0,deg2rad(90)]))
     thumb_shape();
+}
+
+module add_default_thumb_cluster() {
+  corner = reduced_inner_cols > 0 ? cornerrow : lastrow;
+  thumborigin = matrix_transform(key_placement_matrix(1, corner), [mount_width / 2, -(mount_height/2), 0]);
+  
+  default_thumb_tl_place_matrix =
+    translate_matrix([-32.5, -14.5, -2.5]) *
+    translate_matrix(thumborigin) *
+    rotate_matrix([deg2rad(7.5), deg2rad(-18), deg2rad(10)]);
+
+  default_thumb_tr_place_matrix =
+    translate_matrix([-12, -16, 3]) *
+    translate_matrix(thumborigin) *
+    rotate_matrix([deg2rad(10), deg2rad(-15), deg2rad(10)]);
+
+  default_thumb_mr_place_matrix =
+    translate_matrix([-29, -40, -13]) *
+    translate_matrix(thumborigin) *
+    rotate_matrix([deg2rad(-6), deg2rad(-34), deg2rad(48)]);
+
+  default_thumb_ml_place_matrix =
+    translate_matrix([-51, -25, -12]) *
+    translate_matrix(thumborigin) *
+    rotate_matrix([deg2rad(6), deg2rad(-34), deg2rad(40)]);
+
+  default_thumb_br_place_matrix =
+    translate_matrix([-37.8, -55.3, -25.3]) *
+    translate_matrix(thumborigin) *
+    rotate_matrix([deg2rad(-16), deg2rad(-33), deg2rad(54)]);
+
+  default_thumb_bl_place_matrix =
+    translate_matrix([-56.3, -43.3, -23.5]) *
+    translate_matrix(thumborigin) *
+    rotate_matrix([deg2rad(-4), deg2rad(-35), deg2rad(52)]);
+
+  sa_double_length = 37.5;
+  double_plate_height = (0.7*sa_double_length - mount_height)  / 3;
+
+  module thumb_post_tr() {
+    translate([(mount_width / 2) - post_adj, ((mount_height/2) + double_plate_height) - post_adj, 0])
+      web_post();
+  }
+  module thumb_post_tl() {
+    translate([-(mount_width / 2) + post_adj, ((mount_height/2) + double_plate_height) - post_adj, 0])
+      web_post();
+  }
+  module thumb_post_bl() {
+    translate([-(mount_width / 2) + post_adj, -((mount_height/2) + double_plate_height) + post_adj, 0])
+      web_post();
+  }
+  module thumb_post_br() {
+    translate([(mount_width / 2) - post_adj, -((mount_height/2) + double_plate_height) + post_adj, 0])
+      web_post();
+  }
+
+  module thumb_shape() {
+    wall_brace(default_thumb_mr_place_matrix, 0, -1, default_thumb_mr_place_matrix, 0, -1) {
+       web_post_br();
+       web_post_br();
+    }
+    wall_brace(default_thumb_mr_place_matrix, 0, -1, default_thumb_mr_place_matrix, 0, -1) {
+       web_post_br();
+       web_post_bl();
+    }
+    wall_brace(default_thumb_br_place_matrix, 0, -1, default_thumb_br_place_matrix, 0, -1) {
+      web_post_br();
+      web_post_bl();
+    }
+    wall_brace(default_thumb_ml_place_matrix, -0.3, 1, default_thumb_ml_place_matrix, 0, 1) {
+      web_post_tr();
+      web_post_tl();
+    }
+    wall_brace(default_thumb_bl_place_matrix, 0, 1, default_thumb_bl_place_matrix, 0, 1) {
+      web_post_tr();
+      web_post_tl();
+    }
+    wall_brace(default_thumb_br_place_matrix, -1, 0, default_thumb_br_place_matrix, -1, 0) {
+      web_post_tl();
+      web_post_bl();
+    }
+    wall_brace(default_thumb_bl_place_matrix, -1, 0, default_thumb_bl_place_matrix, -1, 0) {
+      web_post_tl();
+      web_post_bl();
+    }
+    // thumb, corners
+    wall_brace(default_thumb_br_place_matrix, -1, 0, default_thumb_br_place_matrix, 0, -1) {
+      web_post_bl();
+      web_post_bl();
+    }
+    wall_brace(default_thumb_bl_place_matrix, -1, 0, default_thumb_bl_place_matrix, 0, 1) {
+      web_post_tl();
+      web_post_tl();
+    }
+    // thumb, tweeners
+    wall_brace(default_thumb_mr_place_matrix, 0, -1, default_thumb_br_place_matrix, 0, -1) {
+      web_post_bl();
+      web_post_br();
+    }
+    wall_brace(default_thumb_ml_place_matrix, 0, 1, default_thumb_bl_place_matrix, 0, 1) {
+      web_post_tl();
+      web_post_tr();
+    }
+    wall_brace(default_thumb_bl_place_matrix, -1, 0, default_thumb_br_place_matrix, -1, 0) {
+      web_post_bl();
+      web_post_tl();
+    }
+    wall_brace(default_thumb_tr_place_matrix, 0, -1, key_placement_matrix(3, lastrow), 0, -1) {
+      web_post_br();
+      web_post_bl();
+    }
+  }
+  
+  module connectors() {
+    triangle_hulls() {
+      multmatrix(default_thumb_tl_place_matrix) thumb_post_tr();
+      multmatrix(default_thumb_tl_place_matrix) thumb_post_br();
+      multmatrix(default_thumb_tr_place_matrix) web_post_tl();
+      multmatrix(default_thumb_tr_place_matrix) web_post_bl();
+    }
+    triangle_hulls() {
+      multmatrix(default_thumb_br_place_matrix) web_post_tr();
+      multmatrix(default_thumb_br_place_matrix) web_post_br();
+      multmatrix(default_thumb_mr_place_matrix) web_post_tl();
+      multmatrix(default_thumb_mr_place_matrix) web_post_bl();
+    }
+    triangle_hulls() {
+      multmatrix(default_thumb_bl_place_matrix) web_post_tr();
+      multmatrix(default_thumb_bl_place_matrix) web_post_br();
+      multmatrix(default_thumb_ml_place_matrix) web_post_tl();
+      multmatrix(default_thumb_ml_place_matrix) web_post_bl();
+    }
+    triangle_hulls() {
+      multmatrix(default_thumb_br_place_matrix) web_post_tl();
+      multmatrix(default_thumb_bl_place_matrix) web_post_bl();
+      multmatrix(default_thumb_br_place_matrix) web_post_tr();
+      multmatrix(default_thumb_bl_place_matrix) web_post_br();
+      multmatrix(default_thumb_mr_place_matrix) web_post_tl();
+      multmatrix(default_thumb_ml_place_matrix) web_post_bl();
+      multmatrix(default_thumb_mr_place_matrix) web_post_tr();
+      multmatrix(default_thumb_ml_place_matrix) web_post_br();
+    }
+    triangle_hulls() {
+      multmatrix(default_thumb_tl_place_matrix) thumb_post_tl();
+      multmatrix(default_thumb_ml_place_matrix) web_post_tr();
+      multmatrix(default_thumb_tl_place_matrix) thumb_post_bl();
+      multmatrix(default_thumb_ml_place_matrix) web_post_br();
+      multmatrix(default_thumb_tl_place_matrix) thumb_post_br();
+      multmatrix(default_thumb_mr_place_matrix) web_post_tr();
+      multmatrix(default_thumb_tr_place_matrix) web_post_bl();
+      multmatrix(default_thumb_mr_place_matrix) web_post_br();
+      multmatrix(default_thumb_tr_place_matrix) web_post_br();
+    }
+    triangle_hulls() {
+      multmatrix(default_thumb_tl_place_matrix) thumb_post_tl();
+      multmatrix(key_placement_matrix(0, cornerrow)) web_post_bl();
+      multmatrix(default_thumb_tl_place_matrix) thumb_post_tr();
+      multmatrix(key_placement_matrix(0, cornerrow)) web_post_br();
+      multmatrix(default_thumb_tr_place_matrix) web_post_tl();
+      multmatrix(key_placement_matrix(1, cornerrow)) web_post_bl();
+      multmatrix(default_thumb_tr_place_matrix) web_post_tr();
+      multmatrix(key_placement_matrix(1, cornerrow)) web_post_br();
+      multmatrix(key_placement_matrix(2, lastrow)) web_post_bl();
+      multmatrix(default_thumb_tr_place_matrix) web_post_tr();
+      multmatrix(key_placement_matrix(2, lastrow)) web_post_bl();
+      multmatrix(default_thumb_tr_place_matrix) web_post_br();
+      multmatrix(key_placement_matrix(2, lastrow)) web_post_br();
+      multmatrix(key_placement_matrix(3, lastrow)) web_post_bl();
+    }
+  }
+
+  children();
+  thumb_shape();
+  connectors();
+}
+
+module add_thumb_cluster() {
+  if (thumb_style == "TRACKBALL_CJ") {
+    add_trackball_cj_thumb_cluster() children();
+  } else if (thumb_style == "DEFAULT") {
+    add_default_thumb_cluster() children();
+  }
 }
 
 // == screw inserts ==
