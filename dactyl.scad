@@ -965,36 +965,15 @@ module add_trackball_cj_thumb_cluster() {
 module add_default_thumb_cluster() {
   corner = reduced_inner_cols > 0 ? cornerrow : lastrow;
   thumborigin = matrix_transform(key_placement_matrix(1, corner), [mount_width / 2, -(mount_height/2), 0]);
-  
-  default_thumb_tl_place_matrix =
-    translate_matrix([-32.5, -14.5, -2.5]) *
-    translate_matrix(thumborigin) *
-    rotate_matrix([deg2rad(7.5), deg2rad(-18), deg2rad(10)]);
 
-  default_thumb_tr_place_matrix =
-    translate_matrix([-12, -16, 3]) *
-    translate_matrix(thumborigin) *
-    rotate_matrix([deg2rad(10), deg2rad(-15), deg2rad(10)]);
-
-  default_thumb_mr_place_matrix =
-    translate_matrix([-29, -40, -13]) *
-    translate_matrix(thumborigin) *
-    rotate_matrix([deg2rad(-6), deg2rad(-34), deg2rad(48)]);
-
-  default_thumb_ml_place_matrix =
-    translate_matrix([-51, -25, -12]) *
-    translate_matrix(thumborigin) *
-    rotate_matrix([deg2rad(6), deg2rad(-34), deg2rad(40)]);
-
-  default_thumb_br_place_matrix =
-    translate_matrix([-37.8, -55.3, -25.3]) *
-    translate_matrix(thumborigin) *
-    rotate_matrix([deg2rad(-16), deg2rad(-33), deg2rad(54)]);
-
-  default_thumb_bl_place_matrix =
-    translate_matrix([-56.3, -43.3, -23.5]) *
-    translate_matrix(thumborigin) *
-    rotate_matrix([deg2rad(-4), deg2rad(-35), deg2rad(52)]);
+  thumb_keys = [
+    translate_matrix([-56.3, -43.3, -23.5]) * translate_matrix(thumborigin) * rotate_matrix([deg2rad(-4), deg2rad(-35), deg2rad(52)]),
+    translate_matrix([-51, -25, -12]) * translate_matrix(thumborigin) * rotate_matrix([deg2rad(6), deg2rad(-34), deg2rad(40)]),
+    translate_matrix([-32.5, -14.5, -2.5]) * translate_matrix(thumborigin) * rotate_matrix([deg2rad(7.5), deg2rad(-18), deg2rad(10)]),
+    translate_matrix([-12, -16, 3]) * translate_matrix(thumborigin) * rotate_matrix([deg2rad(10), deg2rad(-15), deg2rad(10)]),
+    translate_matrix([-37.8, -55.3, -25.3]) * translate_matrix(thumborigin) * rotate_matrix([deg2rad(-16), deg2rad(-33), deg2rad(54)]),
+    translate_matrix([-29, -40, -13]) * translate_matrix(thumborigin) * rotate_matrix([deg2rad(-6), deg2rad(-34), deg2rad(48)])
+  ];
 
   sa_double_length = 37.5;
   double_plate_height = (0.7*sa_double_length - mount_height)  / 3;
@@ -1027,57 +1006,57 @@ module add_default_thumb_cluster() {
   }
 
   module thumb_walls() {
-    wall_brace(default_thumb_mr_place_matrix, 0, -1, default_thumb_tr_place_matrix, 0, -1) {
+    wall_brace(thumb_keys[5], 0, -1, thumb_keys[3], 0, -1) {
        web_post_br();
        web_post_br();
     }
-    wall_brace(default_thumb_mr_place_matrix, 0, -1, default_thumb_mr_place_matrix, 0, -1) {
+    wall_brace(thumb_keys[5], 0, -1, thumb_keys[5], 0, -1) {
        web_post_br();
        web_post_bl();
     }
-    wall_brace(default_thumb_br_place_matrix, 0, -1, default_thumb_br_place_matrix, 0, -1) {
+    wall_brace(thumb_keys[4], 0, -1, thumb_keys[4], 0, -1) {
       web_post_br();
       web_post_bl();
     }
-    wall_brace(default_thumb_ml_place_matrix, -0.3, 1, default_thumb_ml_place_matrix, 0, 1) {
+    wall_brace(thumb_keys[1], -0.3, 1, thumb_keys[1], 0, 1) {
       web_post_tr();
       web_post_tl();
     }
-    wall_brace(default_thumb_bl_place_matrix, 0, 1, default_thumb_bl_place_matrix, 0, 1) {
+    wall_brace(thumb_keys[0], 0, 1, thumb_keys[0], 0, 1) {
       web_post_tr();
       web_post_tl();
     }
-    wall_brace(default_thumb_br_place_matrix, -1, 0, default_thumb_br_place_matrix, -1, 0) {
+    wall_brace(thumb_keys[4], -1, 0, thumb_keys[4], -1, 0) {
       web_post_tl();
       web_post_bl();
     }
-    wall_brace(default_thumb_bl_place_matrix, -1, 0, default_thumb_bl_place_matrix, -1, 0) {
+    wall_brace(thumb_keys[0], -1, 0, thumb_keys[0], -1, 0) {
       web_post_tl();
       web_post_bl();
     }
     // thumb, corners
-    wall_brace(default_thumb_br_place_matrix, -1, 0, default_thumb_br_place_matrix, 0, -1) {
+    wall_brace(thumb_keys[4], -1, 0, thumb_keys[4], 0, -1) {
       web_post_bl();
       web_post_bl();
     }
-    wall_brace(default_thumb_bl_place_matrix, -1, 0, default_thumb_bl_place_matrix, 0, 1) {
+    wall_brace(thumb_keys[0], -1, 0, thumb_keys[0], 0, 1) {
       web_post_tl();
       web_post_tl();
     }
     // thumb, tweeners
-    wall_brace(default_thumb_mr_place_matrix, 0, -1, default_thumb_br_place_matrix, 0, -1) {
+    wall_brace(thumb_keys[5], 0, -1, thumb_keys[4], 0, -1) {
       web_post_bl();
       web_post_br();
     }
-    wall_brace(default_thumb_ml_place_matrix, 0, 1, default_thumb_bl_place_matrix, 0, 1) {
+    wall_brace(thumb_keys[1], 0, 1, thumb_keys[0], 0, 1) {
       web_post_tl();
       web_post_tr();
     }
-    wall_brace(default_thumb_bl_place_matrix, -1, 0, default_thumb_br_place_matrix, -1, 0) {
+    wall_brace(thumb_keys[0], -1, 0, thumb_keys[4], -1, 0) {
       web_post_bl();
       web_post_tl();
     }
-    wall_brace(default_thumb_tr_place_matrix, 0, -1, key_placement_matrix(3, lastrow), 0, -1) {
+    wall_brace(thumb_keys[3], 0, -1, key_placement_matrix(3, lastrow), 0, -1) {
       web_post_br();
       web_post_bl();
     }
@@ -1085,57 +1064,57 @@ module add_default_thumb_cluster() {
   
   module connectors() {
     triangle_hulls() {
-      multmatrix(default_thumb_tl_place_matrix) thumb_post_tr();
-      multmatrix(default_thumb_tl_place_matrix) thumb_post_br();
-      multmatrix(default_thumb_tr_place_matrix) web_post_tl();
-      multmatrix(default_thumb_tr_place_matrix) web_post_bl();
+      multmatrix(thumb_keys[2]) thumb_post_tr();
+      multmatrix(thumb_keys[2]) thumb_post_br();
+      multmatrix(thumb_keys[3]) web_post_tl();
+      multmatrix(thumb_keys[3]) web_post_bl();
     }
     triangle_hulls() {
-      multmatrix(default_thumb_br_place_matrix) web_post_tr();
-      multmatrix(default_thumb_br_place_matrix) web_post_br();
-      multmatrix(default_thumb_mr_place_matrix) web_post_tl();
-      multmatrix(default_thumb_mr_place_matrix) web_post_bl();
+      multmatrix(thumb_keys[4]) web_post_tr();
+      multmatrix(thumb_keys[4]) web_post_br();
+      multmatrix(thumb_keys[5]) web_post_tl();
+      multmatrix(thumb_keys[5]) web_post_bl();
     }
     triangle_hulls() {
-      multmatrix(default_thumb_bl_place_matrix) web_post_tr();
-      multmatrix(default_thumb_bl_place_matrix) web_post_br();
-      multmatrix(default_thumb_ml_place_matrix) web_post_tl();
-      multmatrix(default_thumb_ml_place_matrix) web_post_bl();
+      multmatrix(thumb_keys[0]) web_post_tr();
+      multmatrix(thumb_keys[0]) web_post_br();
+      multmatrix(thumb_keys[1]) web_post_tl();
+      multmatrix(thumb_keys[1]) web_post_bl();
     }
     triangle_hulls() {
-      multmatrix(default_thumb_br_place_matrix) web_post_tl();
-      multmatrix(default_thumb_bl_place_matrix) web_post_bl();
-      multmatrix(default_thumb_br_place_matrix) web_post_tr();
-      multmatrix(default_thumb_bl_place_matrix) web_post_br();
-      multmatrix(default_thumb_mr_place_matrix) web_post_tl();
-      multmatrix(default_thumb_ml_place_matrix) web_post_bl();
-      multmatrix(default_thumb_mr_place_matrix) web_post_tr();
-      multmatrix(default_thumb_ml_place_matrix) web_post_br();
+      multmatrix(thumb_keys[4]) web_post_tl();
+      multmatrix(thumb_keys[0]) web_post_bl();
+      multmatrix(thumb_keys[4]) web_post_tr();
+      multmatrix(thumb_keys[0]) web_post_br();
+      multmatrix(thumb_keys[5]) web_post_tl();
+      multmatrix(thumb_keys[1]) web_post_bl();
+      multmatrix(thumb_keys[5]) web_post_tr();
+      multmatrix(thumb_keys[1]) web_post_br();
     }
     triangle_hulls() {
-      multmatrix(default_thumb_tl_place_matrix) thumb_post_tl();
-      multmatrix(default_thumb_ml_place_matrix) web_post_tr();
-      multmatrix(default_thumb_tl_place_matrix) thumb_post_bl();
-      multmatrix(default_thumb_ml_place_matrix) web_post_br();
-      multmatrix(default_thumb_tl_place_matrix) thumb_post_br();
-      multmatrix(default_thumb_mr_place_matrix) web_post_tr();
-      multmatrix(default_thumb_tr_place_matrix) web_post_bl();
-      multmatrix(default_thumb_mr_place_matrix) web_post_br();
-      multmatrix(default_thumb_tr_place_matrix) web_post_br();
+      multmatrix(thumb_keys[2]) thumb_post_tl();
+      multmatrix(thumb_keys[1]) web_post_tr();
+      multmatrix(thumb_keys[2]) thumb_post_bl();
+      multmatrix(thumb_keys[1]) web_post_br();
+      multmatrix(thumb_keys[2]) thumb_post_br();
+      multmatrix(thumb_keys[5]) web_post_tr();
+      multmatrix(thumb_keys[3]) web_post_bl();
+      multmatrix(thumb_keys[5]) web_post_br();
+      multmatrix(thumb_keys[3]) web_post_br();
     }
     triangle_hulls() {
-      multmatrix(default_thumb_tl_place_matrix) thumb_post_tl();
+      multmatrix(thumb_keys[2]) thumb_post_tl();
       multmatrix(key_placement_matrix(0, cornerrow)) web_post_bl();
-      multmatrix(default_thumb_tl_place_matrix) thumb_post_tr();
+      multmatrix(thumb_keys[2]) thumb_post_tr();
       multmatrix(key_placement_matrix(0, cornerrow)) web_post_br();
-      multmatrix(default_thumb_tr_place_matrix) web_post_tl();
+      multmatrix(thumb_keys[3]) web_post_tl();
       multmatrix(key_placement_matrix(1, cornerrow)) web_post_bl();
-      multmatrix(default_thumb_tr_place_matrix) web_post_tr();
+      multmatrix(thumb_keys[3]) web_post_tr();
       multmatrix(key_placement_matrix(1, cornerrow)) web_post_br();
       multmatrix(key_placement_matrix(2, lastrow)) web_post_bl();
-      multmatrix(default_thumb_tr_place_matrix) web_post_tr();
+      multmatrix(thumb_keys[3]) web_post_tr();
       multmatrix(key_placement_matrix(2, lastrow)) web_post_bl();
-      multmatrix(default_thumb_tr_place_matrix) web_post_br();
+      multmatrix(thumb_keys[3]) web_post_br();
       multmatrix(key_placement_matrix(2, lastrow)) web_post_br();
       multmatrix(key_placement_matrix(3, lastrow)) web_post_bl();
     }
@@ -1147,10 +1126,10 @@ module add_default_thumb_cluster() {
         web_post();
       translate(matrix_transform(inner_wall_placement_matrix(cornerrow, -1), wall_locate3(-1, 0)))
         web_post();
-      multmatrix(default_thumb_ml_place_matrix)
+      multmatrix(thumb_keys[1])
         translate(wall_locate2(-0.3, 1))
           web_post_tr();
-      multmatrix(default_thumb_ml_place_matrix)
+      multmatrix(thumb_keys[1])
         translate(wall_locate3(-0.3, 1))
           web_post_tr();
     }
@@ -1159,13 +1138,13 @@ module add_default_thumb_cluster() {
         web_post();
       translate(matrix_transform(inner_wall_placement_matrix(cornerrow, -1), wall_locate3(-1, 0)))
         web_post();
-      multmatrix(default_thumb_ml_place_matrix)
+      multmatrix(thumb_keys[1])
         translate(wall_locate2(-0.3, 1))
           web_post_tr();
-      multmatrix(default_thumb_ml_place_matrix)
+      multmatrix(thumb_keys[1])
         translate(wall_locate3(-0.3, 1))
           web_post_tr();
-      multmatrix(default_thumb_tl_place_matrix)
+      multmatrix(thumb_keys[2])
         thumb_post_tl();
     }
     hull() {
@@ -1175,7 +1154,7 @@ module add_default_thumb_cluster() {
         web_post();
       translate(matrix_transform(inner_wall_placement_matrix(cornerrow, -1), wall_locate3(-1, 0)))
         web_post();
-      multmatrix(default_thumb_tl_place_matrix)
+      multmatrix(thumb_keys[2])
         thumb_post_tl();
       
     }
@@ -1184,32 +1163,32 @@ module add_default_thumb_cluster() {
       translate(matrix_transform(inner_wall_placement_matrix(cornerrow, -1), wall_locate1(-1, 0)))
         web_post();
       multmatrix(key_placement_matrix(0, cornerrow)) web_post_bl();
-      multmatrix(default_thumb_tl_place_matrix) thumb_post_tl();
+      multmatrix(thumb_keys[2]) thumb_post_tl();
     }
     hull() {
-      multmatrix(default_thumb_ml_place_matrix) web_post_tr();
-      multmatrix(default_thumb_ml_place_matrix)
+      multmatrix(thumb_keys[1]) web_post_tr();
+      multmatrix(thumb_keys[1])
         translate(wall_locate1(-0.3, 1))
           web_post_tr();
-      multmatrix(default_thumb_ml_place_matrix)
+      multmatrix(thumb_keys[1])
         translate(wall_locate2(-0.3, 1))
           web_post_tr();
-      multmatrix(default_thumb_ml_place_matrix)
+      multmatrix(thumb_keys[1])
         translate(wall_locate3(-0.3, 1))
           web_post_tr();
-      multmatrix(default_thumb_tl_place_matrix) thumb_post_tl();
+      multmatrix(thumb_keys[2]) thumb_post_tl();
     }
   }
 
   module thumb_1x_layout() {
-    multmatrix(default_thumb_mr_place_matrix) children();
-    multmatrix(default_thumb_ml_place_matrix) children();
-    multmatrix(default_thumb_br_place_matrix) children();
-    multmatrix(default_thumb_bl_place_matrix) children();
-    multmatrix(default_thumb_tr_place_matrix) children();
+    multmatrix(thumb_keys[5]) children();
+    multmatrix(thumb_keys[1]) children();
+    multmatrix(thumb_keys[4]) children();
+    multmatrix(thumb_keys[0]) children();
+    multmatrix(thumb_keys[3]) children();
   }
   module thumb_15x_layout() {
-    multmatrix(default_thumb_tl_place_matrix) children();
+    multmatrix(thumb_keys[2]) children();
   }
 
   module thumb_plates() {
