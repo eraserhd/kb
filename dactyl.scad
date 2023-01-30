@@ -951,7 +951,6 @@ module add_trackball_cj_thumb_cluster() {
   }
   
   module thumb_shape() {
-    assert(thumb_style == "TRACKBALL_CJ", "CJ trackball is the only one supported");
     tbcj_thumb();
     tbcj_connectors();
     tbcj_connection();
@@ -1017,8 +1016,8 @@ module add_default_thumb_cluster() {
       web_post();
   }
 
-  module thumb_shape() {
-    wall_brace(default_thumb_mr_place_matrix, 0, -1, default_thumb_mr_place_matrix, 0, -1) {
+  module thumb_walls() {
+    wall_brace(default_thumb_mr_place_matrix, 0, -1, default_thumb_tr_place_matrix, 0, -1) {
        web_post_br();
        web_post_br();
     }
@@ -1132,9 +1131,70 @@ module add_default_thumb_cluster() {
     }
   }
 
+  module connection() {
+    bottom_hull() {
+      translate(matrix_transform(inner_wall_placement_matrix(cornerrow, -1), wall_locate2(-1, 0)))
+        web_post();
+      translate(matrix_transform(inner_wall_placement_matrix(cornerrow, -1), wall_locate3(-1, 0)))
+        web_post();
+      multmatrix(default_thumb_ml_place_matrix)
+        translate(wall_locate2(-0.3, 1))
+          web_post_tr();
+      multmatrix(default_thumb_ml_place_matrix)
+        translate(wall_locate3(-0.3, 1))
+          web_post_tr();
+    }
+    hull() {
+      translate(matrix_transform(inner_wall_placement_matrix(cornerrow, -1), wall_locate2(-1, 0)))
+        web_post();
+      translate(matrix_transform(inner_wall_placement_matrix(cornerrow, -1), wall_locate3(-1, 0)))
+        web_post();
+      multmatrix(default_thumb_ml_place_matrix)
+        translate(wall_locate2(-0.3, 1))
+          web_post_tr();
+      multmatrix(default_thumb_ml_place_matrix)
+        translate(wall_locate3(-0.3, 1))
+          web_post_tr();
+      multmatrix(default_thumb_tl_place_matrix)
+        thumb_post_tl();
+    }
+    hull() {
+      translate(matrix_transform(inner_wall_placement_matrix(cornerrow, -1), wall_locate1(-1, 0)))
+        web_post();
+      translate(matrix_transform(inner_wall_placement_matrix(cornerrow, -1), wall_locate2(-1, 0)))
+        web_post();
+      translate(matrix_transform(inner_wall_placement_matrix(cornerrow, -1), wall_locate3(-1, 0)))
+        web_post();
+      multmatrix(default_thumb_tl_place_matrix)
+        thumb_post_tl();
+      
+    }
+    hull() {
+      multmatrix(inner_wall_placement_matrix(cornerrow, -1)) web_post();
+      translate(matrix_transform(inner_wall_placement_matrix(cornerrow, -1), wall_locate1(-1, 0)))
+        web_post();
+      multmatrix(key_placement_matrix(0, cornerrow)) web_post_bl();
+      multmatrix(default_thumb_tl_place_matrix) thumb_post_tl();
+    }
+    hull() {
+      multmatrix(default_thumb_ml_place_matrix) web_post_tr();
+      multmatrix(default_thumb_ml_place_matrix)
+        translate(wall_locate1(-0.3, 1))
+          web_post_tr();
+      multmatrix(default_thumb_ml_place_matrix)
+        translate(wall_locate2(-0.3, 1))
+          web_post_tr();
+      multmatrix(default_thumb_ml_place_matrix)
+        translate(wall_locate3(-0.3, 1))
+          web_post_tr();
+      multmatrix(default_thumb_tl_place_matrix) thumb_post_tl();
+    }
+  }
+
   children();
-  thumb_shape();
+  thumb_walls();
   connectors();
+  connection();
 }
 
 module add_thumb_cluster() {
@@ -1142,6 +1202,8 @@ module add_thumb_cluster() {
     add_trackball_cj_thumb_cluster() children();
   } else if (thumb_style == "DEFAULT") {
     add_default_thumb_cluster() children();
+  } else {
+    assert(false, "thumb_style can only be DEFAULT or TRACKBALL_CJ");
   }
 }
 
