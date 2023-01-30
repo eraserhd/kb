@@ -999,6 +999,16 @@ module add_default_thumb_cluster() {
   sa_double_length = 37.5;
   double_plate_height = (0.7*sa_double_length - mount_height)  / 3;
 
+  module double_plate() {
+    module double_plate_half() {
+      translate([0, (double_plate_height + mount_height) /2, plate_thickness - (web_thickness / 2)])
+        cube([mount_width, double_plate_height, web_thickness], center=true);
+    }
+
+    double_plate_half();
+    mirror([0,1,0]) double_plate_half();
+  }
+
   module thumb_post_tr() {
     translate([(mount_width / 2) - post_adj, ((mount_height/2) + double_plate_height) - post_adj, 0])
       web_post();
@@ -1191,10 +1201,28 @@ module add_default_thumb_cluster() {
     }
   }
 
+  module thumb_1x_layout() {
+    multmatrix(default_thumb_mr_place_matrix) children();
+    multmatrix(default_thumb_ml_place_matrix) children();
+    multmatrix(default_thumb_br_place_matrix) children();
+    multmatrix(default_thumb_bl_place_matrix) children();
+    multmatrix(default_thumb_tr_place_matrix) children();
+  }
+  module thumb_15x_layout() {
+    multmatrix(default_thumb_tl_place_matrix) children();
+  }
+
+  module thumb_plates() {
+    thumb_1x_layout() single_plate();
+    thumb_15x_layout() rotate([0,0,-90]) single_plate();
+    thumb_15x_layout() double_plate();
+  }
+
   children();
   thumb_walls();
   connectors();
   connection();
+  thumb_plates();
 }
 
 module add_thumb_cluster() {
