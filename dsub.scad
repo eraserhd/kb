@@ -22,6 +22,27 @@ module dsub(sz, dsub_clearance=0.85, screw_clearance=0.2) {
     }
 }
 
+module dsub_2(sz, dsub_clearance=0.85, screw_clearance=0.2) {
+    module screw_hole() {
+        circle(r=1.6+screw_clearance);
+    }
+
+    $fn=64;
+
+    cs=(sz/2)-2.6;
+    cs2=(sz/2)-3.6;
+    ns=(sz/2)+4.04;
+    translate([0,-ns]) screw_hole();
+    translate([0,ns]) screw_hole();
+
+    hull() {
+        translate([-1.66, -cs]) circle(r=2.6+dsub_clearance);
+        translate([-1.66, cs]) circle(r=2.6+dsub_clearance);
+        translate([+1.66, -cs2]) circle(r=2.6+dsub_clearance);
+        translate([+1.66, cs2]) circle(r=2.6+dsub_clearance);
+    }
+}
+
 module db9() {
     dsub(17.04);
 }
