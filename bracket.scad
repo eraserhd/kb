@@ -3,7 +3,7 @@ use <dsub.scad>;
 hp = 5.08;
 faceplate_width = 10 * hp;
 faceplate_height = 128.5;
-rail_clearance = 8.5;
+rail_clearance = 12;
 edge_clearance = 5;
 dsub_distance = 17;
 
@@ -15,7 +15,7 @@ panel_mount_usb_flat_edge = 0.8;
 bracket_depth = 1.75 * 25.4;
 tab_width = 6;
 rivet_hole_diameter = 3.5;
-standoff_hole_diameter = 2;
+standoff_hole_diameter = 2.5;
 
 module usb_hole() {
   difference() {
