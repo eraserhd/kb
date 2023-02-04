@@ -25,6 +25,25 @@ module usb_hole() {
   }
 }
 
+module routed_holes() {
+  module dsub_2(sz, dsub_clearance=0.85, screw_clearance=0.2) {
+      $fn=64;
+
+      cs=(sz/2)-2.6;
+      cs2=(sz/2)-3.6;
+      ns=(sz/2)+4.04;
+      hull() {
+          translate([-1.66, -cs]) circle(r=2.6+dsub_clearance);
+          translate([-1.66, cs]) circle(r=2.6+dsub_clearance);
+          translate([+1.66, -cs2]) circle(r=2.6+dsub_clearance);
+          translate([+1.66, cs2]) circle(r=2.6+dsub_clearance);
+      }
+  }
+  translate([-dsub_distance/2, 29]) dsub_2(25.37);
+  translate([+dsub_distance/2, 29]) dsub_2(25.37);
+  translate([0, -8]) usb_hole();
+}
+
 module faceplate_holes() {
   translate([-dsub_distance/2, 29]) dsub_2(25.37);
   translate([+dsub_distance/2, 29]) dsub_2(25.37);
