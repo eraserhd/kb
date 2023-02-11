@@ -120,7 +120,7 @@
 
   (footprint "Connector_USB:USB_Mini-B_Tensility_54-00023_Vertical" (layer "F.Cu")
     (tedit 5A24F112) (tstamp 0319bab4-961a-466a-a5f5-01eff00ec0a3)
-    (at 66.04 99.06 90)
+    (at 68.58 101.6 90)
     (descr "http://www.tensility.com/pdffiles/54-00023.pdf")
     (tags "usb mini receptacle vertical")
     (property "Sheetfile" "europico.kicad_sch")
@@ -513,5 +513,7 @@
       (rotate (xyz 0 0 0))
     )
   )
+
+  (gr_rect (start 104.14 68.58) (end 63.5 129.54) (layer "Edge.Cuts") (width 0.1) (fill none) (tstamp 9aca127e-7d79-42c6-b555-d1d6d93ff9bc))
 
 )
