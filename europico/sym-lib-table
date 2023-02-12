@@ -1,4 +1,5 @@
 (sym_lib_table
   (lib (name "MCU_RaspberryPi_and_Boards")(type "KiCad")(uri "/home/jfelice/src/KiCad-RP-Pico/RP-Pico Libraries/MCU_RaspberryPi_and_Boards.kicad_sym")(options "")(descr ""))
   (lib (name "Pico")(type "KiCad")(uri "${KIPRJMOD}/Pico.kicad_sym")(options "")(descr ""))
+  (lib (name "USB")(type "KiCad")(uri "${KIPRJMOD}/USB.kicad_sym")(options "")(descr ""))
 )
