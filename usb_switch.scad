@@ -26,7 +26,7 @@ module faceplate() {
     square([faceplate_width, faceplate_height], center=true);
     translate([0, usba_offset]) usba();
     translate([0, usba_offset + usba_body_height/2 + rotary_switch_body_diameter/2])
-      circle(d=rotary_switch_shaft_diameter);
+      circle(d=rotary_switch_shaft_diameter, $fn=25);
   }
 }
 
