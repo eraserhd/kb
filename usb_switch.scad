@@ -4,6 +4,8 @@ faceplate_width = 10 * hp;
 faceplate_height = 128.5;
 rail_clearance = 12;
 
+rotary_switch_body_diameter = 44.5;
+rotary_switch_shaft_diameter = 8;
 
 usba_body_height = 18;
 module usba() {
@@ -19,9 +21,12 @@ module usba() {
 }
 
 module faceplate() {
+  usba_offset = -faceplate_height/2 + usba_body_height/2 + rail_clearance + 5;
   difference() {
     square([faceplate_width, faceplate_height], center=true);
-    translate([0, -faceplate_height/2 + usba_body_height/2 + rail_clearance + 5]) usba();
+    translate([0, usba_offset]) usba();
+    translate([0, usba_offset + usba_body_height/2 + rotary_switch_body_diameter/2])
+      circle(d=rotary_switch_shaft_diameter);
   }
 }
 
