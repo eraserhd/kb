@@ -7,7 +7,18 @@ rail_clearance = 12;
 rotary_switch_body_diameter = 44.5;
 rotary_switch_shaft_diameter = 8;
 
+module rounded_rectangle(width, height, diameter) {
+  hull() {
+    for (x = [-1, 1]) {
+      for (y = [-1, 1]) {
+        translate([x*(width/2 - diameter/2), y*(height/2 - diameter/2)]) circle(d=diameter);
+      }
+    }
+  }
+}
+
 usba_body_height = 18;
+usba_max_corner_diameter = 1.38;
 module usba() {
   usba_hole_width = 16.55;
   usba_hole_height = 14.55;
@@ -15,17 +26,18 @@ module usba() {
   module screw_hole() {
     circle(d=screw_hole_diameter, $fn=25);
   }
-  square([usba_hole_width, usba_hole_height], center=true);
+  rounded_rectangle(usba_hole_width, usba_hole_height, 1, $fn=20);
   translate([-24/2, +9/2]) screw_hole();
   translate([+24/2, -9/2]) screw_hole();
 }
 
 usbmini_body_width = 20;
 usbmini_body_height = 10;
+usbmini_max_corner_diameter = 1.25;
 module usbmini() {
   hole_width = 9.75;
   hole_height = 6.75;
-  square([hole_width, hole_height], center=true);
+  rounded_rectangle(hole_width, hole_height, 1);
   translate([-15/2,0]) circle(d=2.8,$fn=25);
   translate([+15/2,0]) circle(d=2.8,$fn=25);
 }
