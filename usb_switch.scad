@@ -1,8 +1,13 @@
 
 hp = 5.08;
 faceplate_width = 10 * hp;
-faceplate_height = 128.5;
+faceplate_height = 129;
 rail_clearance = 12;
+
+screw_hole_diameter = 3;
+screw_hole_distance_from_top = 1.5 + screw_hole_diameter/2;
+screw_hole_distance_from_side = 4.6 + 5/2;
+slot_center_distance = 122.5;
 
 rotary_switch_body_diameter = 44.5;
 rotary_switch_shaft_diameter = 8;
@@ -60,6 +65,17 @@ module faceplate() {
     translate([+inner_distance/2,top_distance]) rotate([0,0,90]) usbmini();
     translate([-inner_distance/2-inner_distance,bottom_distance]) rotate([0,0,90]) usbmini();
     translate([+inner_distance/2+inner_distance,bottom_distance]) rotate([0,0,90]) usbmini();
+    
+    for (x = [-1, 1]) {
+        for (y = [-1, 1]) {
+            translate([
+              x*(faceplate_width/2 - screw_hole_distance_from_side),
+              y*slot_center_distance/2,
+              0
+            ])
+              circle(d=screw_hole_diameter, $fn=20);
+        }
+    }
   }
 }
 
