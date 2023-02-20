@@ -10,7 +10,7 @@ screw_hole_distance_from_side = 4.6 + 5/2;
 slot_center_distance = 122.5;
 
 rotary_switch_body_diameter = 44.5;
-rotary_switch_shaft_diameter = 8;
+rotary_switch_shaft_diameter = 10;
 
 module rounded_rectangle(width, height, diameter) {
   hull() {
