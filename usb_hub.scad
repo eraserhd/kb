@@ -51,7 +51,7 @@ module faceplate() {
     translate([0, usba_offset]) rotate([0, 0, 90]) usba_double();
     translate([0, usba_offset + usba_body_height - 5]) rotate([0, 0, 90]) usba_double();
 
-    translate([usba_hole_height/2 - usbmini_hole_height/2, faceplate_height/2 - rail_clearance - usbmini_body_width/2])
+    translate([0, faceplate_height/2 - rail_clearance - usbmini_body_width/2])
         rotate([0,0,90])
         usbmini();
 

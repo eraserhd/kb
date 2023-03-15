@@ -61,6 +61,11 @@ module faceplate() {
     top_distance = rotary_switch_body_diameter/2 + usbmini_body_width/2 + 5;
     bottom_distance = top_distance - 10;
     
+    echo(usba_offset + faceplate_height/2);
+    
+    echo(faceplate_width/2 - inner_distance/2);
+    echo(faceplate_width/2 - inner_distance/2 - inner_distance);
+    
     translate([-inner_distance/2,top_distance]) rotate([0,0,90]) usbmini();
     translate([+inner_distance/2,top_distance]) rotate([0,0,90]) usbmini();
     translate([-inner_distance/2-inner_distance,bottom_distance]) rotate([0,0,90]) usbmini();
