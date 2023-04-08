@@ -3,3 +3,4 @@
 *.elf
 /_build
 /mnt
+*.FCStd1
