@@ -11,14 +11,30 @@ segment_gutter = 0.01*inch;
 segment_width = (0.869*inch - 2*segment_gutter)/3;
 segment_depth = 0.195*inch;
 
-button_position = function(n)
+up_button_component = 0;
+enter_button_component = 1;
+power_switch_component = 2;
+iron_plug_component = 3;
+
+button_diameter = 19;
+
+component_position = function(n)
   let (
     x_offset = control_board_width + component_gutter + button_diameter/2,
+    x_spacing = button_diameter + component_gutter,
     y_space = control_board_height - button_diameter,
     y_offset = -button_diameter/2,
-    y_spacing = -y_space / 2
+    y_spacing = -y_space / 2,
+    grid = [
+      [0, 1],
+      [1, 1],
+      [0.5, 2],
+      [0.5, 0],
+    ],
+    x = x_offset + grid[n].x * x_spacing,
+    y = y_offset + grid[n].y * y_spacing
   )
-  [x_offset, y_offset + (n-1)*y_spacing, 0];
+  [x, y, 0];
 
 // reference: upper, left corner at 0,0
 module control_board() {
@@ -59,7 +75,6 @@ module control_board() {
   }
 }
 
-button_diameter = 19;
 module button() {
   $fn=35;
   translate([0,0,oak_thickness - 3]) {
@@ -92,18 +107,42 @@ module power_switch() {
   }
 }
 
-module components() {
-  translate([0,0, -0.2*inch]) control_board();
-  translate(button_position(1)) button();
-  translate(button_position(2)) button();
-  translate(button_position(3)) power_switch();
+plug_shaft_diameter = 0.732*inch;
+plug_shaft_height = 0.447*inch;
+plug_flange_thickness = 2;
+module iron_plug() {
+  translate([0,0,oak_thickness-plug_shaft_height/2]) cylinder(plug_shaft_height, d=plug_shaft_diameter, center=true);
+  translate([0,0,oak_thickness+plug_flange_thickness/2]) cylinder(plug_flange_thickness, d=21.75, center=true);
 }
 
-top_width = control_board_width + button_diameter + 3*component_gutter + 2*oak_thickness;
+module components() {
+  translate([0,0, -0.2*inch]) control_board();
+  translate(component_position(up_button_component)) button();
+  translate(component_position(enter_button_component)) button();
+  translate(component_position(power_switch_component)) power_switch();
+  translate(component_position(iron_plug_component)) iron_plug();
+}
+
+iron_bracket_width = 0.79*inch;
+top_width = 
+  oak_thickness +
+  component_gutter +
+  control_board_width +
+  component_gutter +
+  button_diameter +
+  component_gutter +
+  button_diameter +
+  component_gutter +
+  iron_bracket_width +
+  component_gutter +
+  oak_thickness;
 top_height = control_board_height + 2*component_gutter + 2*oak_thickness;
 viewport_diameter = (1+3/8)*inch;
 viewport_floor_thickness = 1/4*inch;
 viewport_through_width = segment_width*3 + 2*segment_gutter;
+
+echo("top dimensions: ", top_width/inch, "x", top_height/inch);
+
 module top() {
   viewport_x = control_board_width/2;
   viewport_y = -segment_distance_from_top -segment_height/2;
@@ -123,7 +162,19 @@ module top() {
     }
 }
 
-components();
-top();
+//components();
+//top();
 
+module iron() {
+  translate([0,0,3.97*inch/2]) cylinder(3.97*inch, d=0.518*inch, center=true);
+  translate([0,0,1.8*inch/2]) cylinder(1.8*inch, d=0.786*inch, center=true);
+  translate([0,0,0.4*inch/2]) cylinder(0.4*inch, d=0.9*inch, center=true);
 
+  translate([0,0,-0.39*inch/2]) cylinder(0.39*inch, d=0.782*inch, center=true);
+  translate([0,0,-0.97*inch/2]) cylinder(0.97*inch, d=0.512*inch, center=true);
+  translate([0,0,-2.66*inch/2]) cylinder(2.66*inch, d=0.304*inch, center=true);
+  translate([0,0,-2.66*inch - 0.58*inch/2]) cylinder(0.58*inch, d2=0.2*inch, d1=0.01*inch, center=true);
+  
+}
+
+iron();
