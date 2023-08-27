@@ -15,8 +15,9 @@ button_diameter = 19;
 button_hole_diameter = 15.8;
 iron_bracket_width = 1.25*inch;
 
-top_angle = 10;
+top_angle = 30;
 top_angle_adjust = oak_thickness * tan(top_angle);
+echo("top_angle_adjust = ",top_angle_adjust);
 top_width = 
   oak_thickness +
   component_gutter +
@@ -37,6 +38,15 @@ top_height =
   component_gutter +
   oak_thickness +
   top_angle_adjust;
+  
+total_front_height = 90;
+total_back_height = 90 + sin(top_angle)*(top_height - top_angle_adjust);
+foot_height = 11.33;
+
+front_height = total_front_height - foot_height - tan(top_angle)*oak_thickness;
+back_height = total_back_height - foot_height - oak_thickness;
+
+echo("fh = ", front_height/inch, "; bh = ", back_height/inch);
 
 component_x = function(grid_pos)
   let (
@@ -179,7 +189,6 @@ viewport_diameter = (1+3/8)*inch;
 viewport_floor_thickness = 1/4*inch;
 viewport_through_width = segment_width*3 + 2*segment_gutter;
 
-echo("top dimensions: ", top_width/inch, "x", top_height/inch);
 
 module top() {
   module hole(position, diameter) {
@@ -210,10 +219,45 @@ module top() {
       hole(power_switch_position, 0.46*inch);
       hole(iron_plug_position, plug_shaft_diameter);
       hole(iron_position, iron_hole_diameter);
+      
+      translate([0,0,oak_thickness+0.1])
+      rotate([-top_angle,0,0])
+      translate([top_width/2,oak_thickness,-oak_thickness])
+      cube([top_width+0.1, 2*oak_thickness, 2*oak_thickness], center=true);
+      
+      translate([0,0,oak_thickness])
+      //rotate([-top_angle,0,0])
+      translate([top_width/2,oak_thickness,-oak_thickness])
+      #cube([top_width+0.1, 2*oak_thickness, 2*oak_thickness], center=true);
+      
     }
 }
 
-//components();
-projection()
-top();
+echo("top dimensions: ", top_width/inch, "x", top_height/inch);
 
+module back() {
+  color("brown")
+  translate([
+      +top_width/2,
+      -oak_thickness/2,
+      -back_height/2
+  ])
+  cube([top_width, oak_thickness, back_height], center=true);
+}
+
+module front() {
+  color("brown")
+  translate([
+      +top_width/2,
+      -oak_thickness/2 - cos(top_angle) * (top_height - top_angle_adjust) + oak_thickness,
+      -front_height/2 - (back_height - front_height)
+  ])
+  cube([top_width, oak_thickness, front_height], center=true);
+}
+// cos(top_angle) = x/top_height
+
+//components();
+translate([0,0,oak_thickness]) rotate([top_angle,0,0]) translate([0,0,-oak_thickness]) top();
+
+back();
+front();
