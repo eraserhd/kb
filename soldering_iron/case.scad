@@ -138,14 +138,17 @@ module power_switch() {
   }
 }
 
-plug_shaft_diameter = 0.732*inch;
+plug_shaft_diameter = 0.695*inch;
 plug_shaft_height = 0.447*inch;
 plug_flange_thickness = 2;
+plug_key_thickness = 3;
+plug_latch_thickness = 5;
 module iron_plug() {
   translate([0,0,oak_thickness-plug_shaft_height/2]) cylinder(plug_shaft_height, d=plug_shaft_diameter, center=true);
   translate([0,0,oak_thickness+plug_flange_thickness/2]) cylinder(plug_flange_thickness, d=21.75, center=true);
 }
 
+iron_hole_diameter=0.783*inch;
 module iron() {
   translate([0,0,oak_thickness]) {
     translate([0,0,3.97*inch/2]) cylinder(3.97*inch, d=0.518*inch, center=true);
@@ -160,14 +163,16 @@ module iron() {
 }
 
 module components() {
-  translate([0,0, -0.2*inch]) control_board();
-  translate([-oak_thickness - component_gutter,oak_thickness + component_gutter,0]) {
-    translate(up_button_position) button();
-    translate(enter_button_position) button();
-    translate(power_switch_position) power_switch();
-    translate(iron_plug_position) iron_plug();
-    translate(iron_position) iron();
-  }
+  translate([
+    oak_thickness + component_gutter,
+    -oak_thickness - component_gutter - top_angle_adjust,
+    -0.2*inch
+  ]) control_board();
+  translate(up_button_position) button();
+  translate(enter_button_position) button();
+  translate(power_switch_position) power_switch();
+  translate(iron_plug_position) iron_plug();
+  translate(iron_position) iron();
 }
 
 viewport_diameter = (1+3/8)*inch;
@@ -177,14 +182,20 @@ viewport_through_width = segment_width*3 + 2*segment_gutter;
 echo("top dimensions: ", top_width/inch, "x", top_height/inch);
 
 module top() {
-  viewport_x = control_board_width/2;
-  viewport_y = -segment_distance_from_top -segment_height/2;
+  module hole(position, diameter) {
+    translate(position)
+    translate([0,0,+oak_thickness/2])
+    cylinder(oak_thickness+0.2, d=diameter, center=true);
+  }
+
+  viewport_x = oak_thickness + component_gutter + control_board_width/2;
+  viewport_y = -top_angle_adjust -oak_thickness - component_gutter -segment_distance_from_top -segment_height/2;
 
   color("brown")
     difference() {
       translate([
-        +top_width/2 - component_gutter - oak_thickness,
-        -top_height/2 + component_gutter + oak_thickness + top_angle_adjust,
+        +top_width/2,
+        -top_height/2,
         +oak_thickness/2
       ])
       cube([top_width,top_height,oak_thickness], center=true);
@@ -194,13 +205,14 @@ module top() {
       translate([viewport_x, viewport_y, 0])
         cube([viewport_through_width, segment_height,viewport_floor_thickness*2+0.1], center=true);
         
-      //hole
-      translate(up_button_position)
-      translate([0,0,+oak_thickness/2])
-      cylinder(oak_thickness+0.2, d=button_hole_diameter, center=true);
+      hole(up_button_position, button_hole_diameter);
+      hole(enter_button_position, button_hole_diameter);
+      hole(power_switch_position, 0.46*inch);
+      hole(iron_plug_position, plug_shaft_diameter);
+      hole(iron_position, iron_hole_diameter);
     }
 }
 
-components();
+//components();
 top();
 
