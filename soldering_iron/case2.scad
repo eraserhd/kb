@@ -97,23 +97,22 @@ module uprights() {
 }
 
 module top_form() {
-    module corner() {
-        //translate([0,0,top_form_corner_diameter/2])
-        //  sphere(d=top_form_corner_diameter);
-        //cylinder(top_form_corner_diameter/2, d=top_form_corner_diameter);
+    module corner_top() {
         rotate_extrude(angle=360) {
             translate([top_form_corner_diameter/2 - top_form_top_diameter/2,
                        top_form_thickness - top_form_top_diameter/2])
               circle(d=top_form_top_diameter);
+        }
+    }
+    module corner_bottom() {
+        rotate_extrude(angle=360) {
             square([top_form_corner_diameter/2 - top_form_fancy_inset, top_form_thickness - top_form_top_diameter/2]);
             square([top_form_corner_diameter/2 - top_form_top_diameter/2, top_form_thickness]);
         }
     }
     color(wood_color) {
-        hull() {
-            for (pos = upright_positions())
-                translate(pos) corner();
-        }
+        hull() for (pos = upright_positions()) translate(pos) corner_top();
+        hull() for (pos = upright_positions()) translate(pos) corner_bottom(); 
     }
 }
 
