@@ -2,44 +2,102 @@
 width = 4;
 left_depth = 3.5;
 right_depth = 2.8;
+height = 3.75;
+top_height = 1/2;
 
 wood_base_thickness = 1/2;
 
 upright_diameter = 5/8;
 wood_base_corner_diameter = 1;
 
+$fn = 30;
+
 upright_positions = function(inset = 0)
   let (
-    edge_distance = wood_base_corner_diameter/2
+    edge_distance = wood_base_corner_diameter/2 + inset
   ) [
-    [edge_distance+inset, edge_distance+inset],
-    [width-2*edge_distance-2*inset, edge_distance+inset],
-    [width-2*edge_distance-2*inset, right_depth-2*edge_distance-2*inset],
-    [edge_distance+inset, left_depth-2*edge_distance-2*inset]
+    [edge_distance, edge_distance],
+    [width-2*edge_distance, edge_distance],
+    [width-2*edge_distance, right_depth-2*edge_distance],
+    [edge_distance, left_depth-2*edge_distance]
   ];
+
+wood_color = "brown";
 
 module wood_base() {
     roundover_radius = wood_base_thickness/8;
-    minkowski() {
-        linear_extrude(wood_base_thickness - roundover_radius) {
-            offset(r=wood_base_corner_diameter/2, $fn=20) {
-                polygon(upright_positions(roundover_radius/2));
-            }
-        }
-        sphere(d=roundover_radius*2);
+    color(wood_color) {
+      minkowski() {
+          linear_extrude(wood_base_thickness - roundover_radius) {
+              offset(r=wood_base_corner_diameter/2) {
+                  polygon(upright_positions(roundover_radius/2));
+              }
+          }
+          sphere(d=roundover_radius*2);
+      }
     }
 }
 
-module upright() {
-    cylinder(2, d=upright_diameter, $fn=20);
+upright_cap_height = 3/16;
+
+module upright_cap() {
+    module solid_bits() {
+        rotate_extrude(angle = 360) {
+            intersection() {
+                union() {
+                    translate([5/16,9/64 - 1/64])
+                      circle(d=4/32);
+                    translate([6/16,3/64])
+                      circle(d=4/32);
+                    polygon([
+                      [0,    0],
+                      [6/16, 0],
+                      [5/16, upright_cap_height],
+                      [0,    upright_cap_height]
+                    ]);
+                }
+                square([5,upright_cap_height]);
+            }
+        }
+    }
+    module bore() {
+        translate([0,0,1/16])
+          cylinder(upright_cap_height+0.001, d=upright_diameter);
+    }
+    module screw_hole() {
+        translate([0,0,-0.001])
+          cylinder(upright_cap_height+0.002, d=1/4);
+    }
+    difference() {
+        solid_bits();
+        bore();
+        screw_hole();
+    }
+}
+
+module upright(height = 2) {
+    color(wood_color)
+      translate([0, 0, upright_cap_height])
+        cylinder(height - 2*upright_cap_height, d=upright_diameter);
+    upright_cap();
+    translate([0, 0, height])
+      rotate([180,0,0])
+        upright_cap();
 }
 
 module uprights() {
     for (pos = upright_positions())
       translate(pos)
-        upright();
+        upright(height - wood_base_thickness - top_height);
 }
 
-wood_base();
-translate([0,0,wood_base_thickness])
-  uprights();
+module case() {
+    wood_base();
+    translate([0,0,wood_base_thickness])
+      uprights();
+}
+
+case();
+//upright_cap();
+
+
