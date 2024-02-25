@@ -1,8 +1,8 @@
 
-width = 4;
-left_depth = 3.5;
+width = 5;
+left_depth = 4.25;
 right_depth = 2.8;
-height = 3.75;
+height = 6;
 top_height = 1/2;
 
 wood_base_thickness = 1/2;
@@ -18,6 +18,13 @@ top_form_corner_diameter = 3/4;
 top_form_top_diameter = 1/4;
 top_form_fancy_inset = 1/64;
 
+transformer_dimensions = [2.34, 2.61, 2.68];
+transformer_position = [
+    wood_base_corner_diameter/2,
+    wood_base_corner_diameter/2,
+    wood_base_thickness + 0.5
+];
+
 $fn = 30;
 
 upright_positions = function(inset = 0)
@@ -25,23 +32,26 @@ upright_positions = function(inset = 0)
     edge_distance = wood_base_corner_diameter/2 + inset
   ) [
     [edge_distance, edge_distance],
-    [width-2*edge_distance, edge_distance],
-    [width-2*edge_distance, right_depth-2*edge_distance],
-    [edge_distance, left_depth-2*edge_distance]
+    [width-edge_distance, edge_distance],
+    [width-edge_distance, right_depth-edge_distance],
+    [edge_distance, left_depth-edge_distance]
   ];
 
 
+
+echo("POSITIONS:", upright_positions());
+
 module wood_base() {
-    roundover_radius = wood_base_thickness/8;
     color(wood_color) {
-      minkowski() {
-          linear_extrude(wood_base_thickness - roundover_radius) {
+          linear_extrude(wood_base_thickness) {
               offset(r=wood_base_corner_diameter/2) {
-                  polygon(upright_positions(roundover_radius/2));
+                  polygon(upright_positions());
               }
+              //offset(r=wood_base_corner_diameter/2) {
+              //    projection()
+              //      transformer();
+              //}
           }
-          sphere(d=roundover_radius*2);
-      }
     }
 }
 
@@ -96,14 +106,18 @@ module uprights() {
         upright(height - wood_base_thickness - top_height);
 }
 
-module top_form() {
-    module corner_top() {
-        rotate_extrude(angle=360) {
+module top_form_corner_top() {
+    rotate_extrude(angle=360) {
+        intersection() {
             translate([top_form_corner_diameter/2 - top_form_top_diameter/2,
                        top_form_thickness - top_form_top_diameter/2])
               circle(d=top_form_top_diameter);
+            square([5,5]);
         }
     }
+}
+
+module top_form() {
     module corner_bottom() {
         rotate_extrude(angle=360) {
             square([top_form_corner_diameter/2 - top_form_fancy_inset, top_form_thickness - top_form_top_diameter/2]);
@@ -111,7 +125,7 @@ module top_form() {
         }
     }
     color(wood_color) {
-        hull() for (pos = upright_positions()) translate(pos) corner_top();
+        hull() for (pos = upright_positions()) translate(pos) top_form_corner_top();
         hull() for (pos = upright_positions()) translate(pos) corner_bottom(); 
     }
 }
@@ -124,5 +138,13 @@ module case() {
       top_form();
 }
 
-case();
 
+module transformer() {
+   translate(transformer_position)
+     cube(transformer_dimensions);
+}
+
+case();
+transformer();
+
+//projection() scale([25.4,25.4,25.4]) translate([-width/2,0]) wood_base();
