@@ -6,13 +6,17 @@ height = 3.75;
 top_height = 1/2;
 
 wood_base_thickness = 1/2;
-top_form_thickness = 1/2;
 
 upright_diameter = 5/8;
 wood_base_corner_diameter = 1;
 wood_color = "brown";
 
 upright_cap_height = 3/16;
+
+top_form_thickness = 1/2;
+top_form_corner_diameter = 3/4;
+top_form_top_diameter = 1/4;
+top_form_fancy_inset = 1/64;
 
 $fn = 30;
 
@@ -93,11 +97,17 @@ module uprights() {
 }
 
 module top_form() {
-    corner_diameter = 3/4; 
     module corner() {
-        translate([0,0,corner_diameter/2])
-          sphere(d=corner_diameter);
-        cylinder(corner_diameter/2, d=corner_diameter);
+        //translate([0,0,top_form_corner_diameter/2])
+        //  sphere(d=top_form_corner_diameter);
+        //cylinder(top_form_corner_diameter/2, d=top_form_corner_diameter);
+        rotate_extrude(angle=360) {
+            translate([top_form_corner_diameter/2 - top_form_top_diameter/2,
+                       top_form_thickness - top_form_top_diameter/2])
+              circle(d=top_form_top_diameter);
+            square([top_form_corner_diameter/2 - top_form_fancy_inset, top_form_thickness - top_form_top_diameter/2]);
+            square([top_form_corner_diameter/2 - top_form_top_diameter/2, top_form_thickness]);
+        }
     }
     color(wood_color) {
         hull() {
@@ -116,4 +126,4 @@ module case() {
 }
 
 case();
-//upright_cap();
+
