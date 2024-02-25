@@ -15,11 +15,12 @@ button_diameter = 19;
 button_hole_diameter = 15.8;
 iron_bracket_width = 1.25*inch;
 
-top_angle = 30;
+top_angle = 22.5;
 top_angle_adjust = oak_thickness * tan(top_angle);
 echo("top_angle_adjust = ",top_angle_adjust);
+top_inset = 1/4*inch;  
 top_width = 
-  oak_thickness +
+  (oak_thickness - top_inset) +
   component_gutter +
   control_board_width +
   component_gutter +
@@ -27,26 +28,31 @@ top_width =
   component_gutter +
   button_diameter +
   component_gutter +
-  iron_bracket_width +
-  component_gutter +
-  oak_thickness;
+//  iron_bracket_width +
+//  component_gutter +
+  (oak_thickness - top_inset);
 top_height =
   top_angle_adjust +
-  oak_thickness +
+  (oak_thickness - top_inset) +
   component_gutter +
   control_board_height +
   component_gutter +
-  oak_thickness +
+  (oak_thickness - top_inset) +
   top_angle_adjust;
   
 total_front_height = 90;
 total_back_height = 90 + sin(top_angle)*(top_height - top_angle_adjust);
 foot_height = 11.33;
 
-front_height = total_front_height - foot_height - tan(top_angle)*oak_thickness;
-back_height = total_back_height - foot_height - oak_thickness;
+front_height = total_front_height - foot_height;
+back_height = total_back_height - foot_height;
 
 echo("fh = ", front_height/inch, "; bh = ", back_height/inch);
+
+side_width = 2*(oak_thickness - top_inset) +
+  cos(top_angle)*(top_height - top_angle_adjust);
+  
+echo("side_width = ", side_width/inch);
 
 component_x = function(grid_pos)
   let (
@@ -218,17 +224,17 @@ module top() {
       hole(enter_button_position, button_hole_diameter);
       hole(power_switch_position, 0.46*inch);
       hole(iron_plug_position, plug_shaft_diameter);
-      hole(iron_position, iron_hole_diameter);
+//      hole(iron_position, iron_hole_diameter);
       
       translate([0,0,oak_thickness+0.1])
       rotate([-top_angle,0,0])
       translate([top_width/2,oak_thickness,-oak_thickness])
       cube([top_width+0.1, 2*oak_thickness, 2*oak_thickness], center=true);
       
-      translate([0,0,oak_thickness])
+      //translate([0,0,oak_thickness])
       //rotate([-top_angle,0,0])
-      translate([top_width/2,oak_thickness,-oak_thickness])
-      #cube([top_width+0.1, 2*oak_thickness, 2*oak_thickness], center=true);
+      //translate([top_width/2,oak_thickness,-oak_thickness])
+      //cube([top_width+0.1, 2*oak_thickness, 2*oak_thickness], center=true);
       
     }
 }
@@ -239,20 +245,21 @@ module back() {
   color("brown")
   translate([
       +top_width/2,
-      -oak_thickness/2,
-      -back_height/2
+      -oak_thickness/2 + oak_thickness - top_inset,
+      -back_height/2 + oak_thickness
   ])
-  cube([top_width, oak_thickness, back_height], center=true);
+  cube([top_width + 2*top_inset, oak_thickness, back_height], center=true);
 }
 
 module front() {
   color("brown")
   translate([
       +top_width/2,
-      -oak_thickness/2 - cos(top_angle) * (top_height - top_angle_adjust) + oak_thickness,
-      -front_height/2 - (back_height - front_height)
+      -oak_thickness/2 + oak_thickness - top_inset - side_width + oak_thickness,
+      //-oak_thickness/2 - cos(top_angle) * (top_height - top_angle_adjust) + oak_thickness - top_inset,
+      -front_height/2 - (back_height - front_height) + oak_thickness
   ])
-  cube([top_width, oak_thickness, front_height], center=true);
+  cube([top_width + 2*top_inset, oak_thickness, front_height], center=true);
 }
 // cos(top_angle) = x/top_height
 
@@ -261,3 +268,6 @@ translate([0,0,oak_thickness]) rotate([top_angle,0,0]) translate([0,0,-oak_thick
 
 back();
 front();
+
+translate([0,-side_width/2 + (oak_thickness - top_inset),-back_height/2 + oak_thickness])
+cube([oak_thickness,side_width,back_height],center=true);
