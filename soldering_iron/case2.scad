@@ -6,9 +6,13 @@ height = 3.75;
 top_height = 1/2;
 
 wood_base_thickness = 1/2;
+top_form_thickness = 1/2;
 
 upright_diameter = 5/8;
 wood_base_corner_diameter = 1;
+wood_color = "brown";
+
+upright_cap_height = 3/16;
 
 $fn = 30;
 
@@ -22,7 +26,6 @@ upright_positions = function(inset = 0)
     [edge_distance, left_depth-2*edge_distance]
   ];
 
-wood_color = "brown";
 
 module wood_base() {
     roundover_radius = wood_base_thickness/8;
@@ -37,8 +40,6 @@ module wood_base() {
       }
     }
 }
-
-upright_cap_height = 3/16;
 
 module upright_cap() {
     module solid_bits() {
@@ -66,7 +67,7 @@ module upright_cap() {
     }
     module screw_hole() {
         translate([0,0,-0.001])
-          cylinder(upright_cap_height+0.002, d=1/4);
+          cylinder(upright_cap_height+0.005, d=1/4);
     }
     difference() {
         solid_bits();
@@ -91,13 +92,28 @@ module uprights() {
         upright(height - wood_base_thickness - top_height);
 }
 
+module top_form() {
+    corner_diameter = 3/4; 
+    module corner() {
+        translate([0,0,corner_diameter/2])
+          sphere(d=corner_diameter);
+        cylinder(corner_diameter/2, d=corner_diameter);
+    }
+    color(wood_color) {
+        hull() {
+            for (pos = upright_positions())
+                translate(pos) corner();
+        }
+    }
+}
+
 module case() {
     wood_base();
     translate([0,0,wood_base_thickness])
       uprights();
+    translate([0,0,height - top_form_thickness])
+      top_form();
 }
 
 case();
 //upright_cap();
-
-
