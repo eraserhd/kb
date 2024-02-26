@@ -145,7 +145,18 @@ module transformer() {
      cube(transformer_dimensions);
 }
 
-case();
-transformer();
 
-//projection() scale([25.4,25.4,25.4]) translate([-width/2,0]) wood_base();
+module bottom_template() {
+    projection()
+        scale([25.4,25.4,25.4]) {
+            difference() {
+                top_form();
+                for (pos = upright_positions())
+                    translate(pos)
+                        cylinder(2, 1/64);
+            }
+        }
+}
+
+case();
+//bottom_template();
