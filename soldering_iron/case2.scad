@@ -5,7 +5,7 @@ right_depth = 3.5;
 height = 6;
 top_height = 1/2;
 
-wood_base_thickness = 1/2;
+wood_base_thickness = 3/4;
 
 upright_diameter = 5/8;
 wood_base_corner_diameter = 1;
@@ -159,4 +159,5 @@ module bottom_template() {
 }
 
 case();
+transformer();
 //bottom_template();
