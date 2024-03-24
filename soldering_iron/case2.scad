@@ -2,8 +2,8 @@
 width = 5;
 left_depth = 4.25;
 right_depth = 3.5;
-height = 6;
-top_height = 1/2;
+height = 6.5;
+top_height = 3/4;
 
 wood_base_thickness = 3/4;
 
@@ -13,9 +13,9 @@ wood_color = "brown";
 
 upright_cap_height = 3/16;
 
-top_form_thickness = 1/2;
+top_form_thickness = 3/4;
 top_form_corner_diameter = 3/4;
-top_form_top_diameter = 1/4;
+top_form_top_radius = 1/4;
 top_form_fancy_inset = 1/64;
 
 transformer_dimensions = [2.61, 2.34, 2.68];
@@ -102,6 +102,7 @@ module upright(height = 2) {
 }
 
 module uprights() {
+    echo("UR HEIGHT:", height - wood_base_thickness - top_height);
     for (pos = upright_positions())
       translate(pos)
         upright(height - wood_base_thickness - top_height);
@@ -110,9 +111,9 @@ module uprights() {
 module top_form_corner_top() {
     rotate_extrude(angle=360) {
         intersection() {
-            translate([top_form_corner_diameter/2 - top_form_top_diameter/2,
-                       top_form_thickness - top_form_top_diameter/2])
-              circle(d=top_form_top_diameter);
+            translate([top_form_corner_diameter/2 - top_form_top_radius,
+                       top_form_thickness - top_form_top_radius])
+              circle(r=top_form_top_radius);
             square([5,5]);
         }
     }
@@ -121,8 +122,8 @@ module top_form_corner_top() {
 module top_form() {
     module corner_bottom() {
         rotate_extrude(angle=360) {
-            square([top_form_corner_diameter/2 - top_form_fancy_inset, top_form_thickness - top_form_top_diameter/2]);
-            square([top_form_corner_diameter/2 - top_form_top_diameter/2, top_form_thickness]);
+            square([top_form_corner_diameter/2 - top_form_fancy_inset, top_form_thickness - top_form_top_radius]);
+            square([top_form_corner_diameter/2 - top_form_top_radius, top_form_thickness]);
         }
     }
     color(wood_color) {
@@ -158,6 +159,24 @@ module bottom_template() {
         }
 }
 
+nixie_width = 0.786;
+nixie_height = 1.165;
+nixie_depth = 1.05;
+nixie_spacing = 0.1;
+module nixie() {
+    translate([0, +nixie_depth/2, +nixie_height/2])
+    cube([nixie_width, nixie_depth, nixie_height], center=true);
+}
+
+module display() {
+    translate([0, 0, height - nixie_height - top_height - 0.25]) {
+        nixie();
+        translate([-nixie_width - nixie_spacing, 0, 0]) nixie();
+        translate([+nixie_width + nixie_spacing, 0, 0]) nixie();
+    }
+}
+
 case();
 transformer();
+display();
 //bottom_template();
