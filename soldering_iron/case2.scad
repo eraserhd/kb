@@ -2,6 +2,18 @@ include <constants.scad>;
 
 $fn = 30;
 
+top_control_positions = let (
+    top_form_edge_delta = (wood_base_corner_diameter - top_form_corner_diameter)/2,
+    top_form_y_min = top_form_edge_delta,
+    top_form_width = width - 2*top_form_edge_delta,
+    outside_control_x = -top_form_width/2 + 1 + 1/4
+) [
+  [                  0, top_form_y_min + 2 + 3/8],
+  [ -outside_control_x, top_form_y_min + 1 + 1/4],
+  [                  0, top_form_y_min + 1 + 1/4],
+  [ +outside_control_x, top_form_y_min + 1 + 1/4],
+];
+
 module wood_base() {
     color(wood_color) {
           linear_extrude(wood_base_thickness) {
@@ -92,6 +104,29 @@ module top_form() {
     }
 }
 
+module control_plate() {
+    hull()
+    scale([0.9, 0.9, 1])
+        for (pos = upright_positions)
+            translate(pos) translate([0, 0.22, 0])
+                circle(d=1/64);
+}
+
+module top_form_template() {
+    scale([25.4,25.4,1])
+    difference() {
+        projection()
+                top_form();
+        for (pos = upright_positions)
+            translate(pos)
+                circle(d=1/64);
+        for (pos = top_control_positions)
+            translate(pos)
+               circle(d=1/64);
+        //control_plate();
+    }
+}
+
 module case() {
     wood_base();
     translate([0,0,wood_base_thickness])
@@ -119,24 +154,62 @@ module bottom_template() {
         }
 }
 
+module hammerforming_support() {
+    scale([25.4,25.4,25.4]) {
+        difference() {
+            hull()
+                for (pos = upright_positions)
+                    translate(pos)
+                        circle(d=upright_diameter - 2*top_form_top_radius);
+            for (pos = top_control_positions)
+                translate(pos)
+                    circle(d=1/64);
+        }
+    }
+}
+
+module hammerforming_sheet_template() {
+    // sheet is 150x150mm
+    diameter = 150/25.4 - ( upright_positions[1].x - upright_positions[0].x );
+    
+    scale([25.4,25.4,25.4]) {
+        difference() {
+            hull()
+                for (pos = upright_positions)
+                    translate(pos)
+                        circle(d=diameter);
+            for (pos = top_control_positions)
+                translate(pos)
+                    circle(d=1/64);
+        }
+    }
+}
+
 nixie_width = 0.786;
 nixie_height = 1.165;
 nixie_depth = 1.05;
 nixie_spacing = 0.1;
 module nixie() {
     translate([0, +nixie_depth/2, +nixie_height/2])
-    cube([nixie_width, nixie_depth, nixie_height], center=true);
+    intersection() {
+        cube([nixie_width, nixie_depth, nixie_height], center=true);
+    }
 }
 
 module display() {
-    translate([0, 0, height - nixie_height - top_height - 0.25]) {
+    spacing_from_top = 0.45;
+    nixie_bottom = height - nixie_height - top_height - spacing_from_top;
+    echo("NIXIE BOTTOM:", nixie_bottom);
+    translate([0, 0, nixie_bottom]) {
         nixie();
         translate([-nixie_width - nixie_spacing, 0, 0]) nixie();
         translate([+nixie_width + nixie_spacing, 0, 0]) nixie();
     }
 }
 
-case();
-transformer();
-display();
+//case();
+//transformer();
+//display();
 //bottom_template();
+top_form_template();
+//control_plate();
