@@ -27,9 +27,9 @@ transformer_position = [
 
 $fn = 30;
 
-upright_positions = function(inset = 0)
+upright_positions =
   let (
-    edge_distance = wood_base_corner_diameter/2 + inset
+    edge_distance = wood_base_corner_diameter/2
   ) [
     [-width/2 + edge_distance, edge_distance],
     [ width/2 - edge_distance, edge_distance],
@@ -38,15 +38,11 @@ upright_positions = function(inset = 0)
     [-width/2 + edge_distance, right_depth-edge_distance]
   ];
 
-
-
-echo("POSITIONS:", upright_positions());
-
 module wood_base() {
     color(wood_color) {
           linear_extrude(wood_base_thickness) {
               offset(r=wood_base_corner_diameter/2) {
-                  polygon(upright_positions());
+                  polygon(upright_positions);
               }
               //offset(r=wood_base_corner_diameter/2) {
               //    projection()
@@ -103,7 +99,7 @@ module upright(height = 2) {
 
 module uprights() {
     echo("UR HEIGHT:", height - wood_base_thickness - top_height);
-    for (pos = upright_positions())
+    for (pos = upright_positions)
       translate(pos)
         upright(height - wood_base_thickness - top_height);
 }
@@ -127,8 +123,8 @@ module top_form() {
         }
     }
     color(wood_color) {
-        hull() for (pos = upright_positions()) translate(pos) top_form_corner_top();
-        hull() for (pos = upright_positions()) translate(pos) corner_bottom(); 
+        hull() for (pos = upright_positions) translate(pos) top_form_corner_top();
+        hull() for (pos = upright_positions) translate(pos) corner_bottom(); 
     }
 }
 
@@ -152,7 +148,7 @@ module bottom_template() {
         scale([25.4,25.4,25.4]) {
             difference() {
                 top_form();
-                for (pos = upright_positions())
+                for (pos = upright_positions)
                     translate(pos)
                         cylinder(2, 1/64);
             }
