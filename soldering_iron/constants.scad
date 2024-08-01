@@ -30,7 +30,7 @@ upright_positions =
   ) [
     [-width/2 + edge_distance, edge_distance],
     [ width/2 - edge_distance, edge_distance],
-    [ width/2 - edge_distance, right_depth-edge_distance],
-    [ 0,                       left_depth-edge_distance],
-    [-width/2 + edge_distance, right_depth-edge_distance]
+    [ width/2 - edge_distance, right_depth - edge_distance],
+    [ 0,                       left_depth - edge_distance],
+    [-width/2 + edge_distnset, right_depth - edge_distance]
   ];
