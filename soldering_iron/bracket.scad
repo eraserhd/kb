@@ -1,10 +1,12 @@
 include <constants.scad>;
 
+$fn = 50;
+
 module baseplate() {
-    inset = 1/4;
+    inset = 1/8;
     thickness = 1/4;
 
-    linear_extrude(h=thickness)
+    linear_extrude(height=thickness)
     offset(delta=-inset)
     difference() {
         polygon(points=[
@@ -12,8 +14,8 @@ module baseplate() {
             upright_positions[0]
         ]);
         for (p = upright_positions)
-            circle(d=upright_diameter + inset);
-    } 
+            translate(p) circle(d=upright_cap_diameter);
+    }
 }
 
 baseplate();

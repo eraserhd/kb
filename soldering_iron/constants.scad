@@ -11,6 +11,7 @@ wood_base_corner_diameter = 1;
 wood_color = "brown";
 
 upright_cap_height = 3/16;
+upright_cap_diameter = 0.866; 
 
 top_form_thickness = 3/4;
 top_form_corner_diameter = 3/4;
@@ -32,5 +33,5 @@ upright_positions =
     [ width/2 - edge_distance, edge_distance],
     [ width/2 - edge_distance, right_depth - edge_distance],
     [ 0,                       left_depth - edge_distance],
-    [-width/2 + edge_distnset, right_depth - edge_distance]
+    [-width/2 + edge_distance, right_depth - edge_distance]
   ];
