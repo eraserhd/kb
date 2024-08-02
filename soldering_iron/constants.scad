@@ -35,3 +35,9 @@ upright_positions =
     [ 0,                       left_depth - edge_distance],
     [-width/2 + edge_distance, right_depth - edge_distance]
   ];
+  
+nixie_width = 0.786;
+nixie_height = 1.165;
+nixie_depth = 1.05;
+nixie_spacing = 0.1;
+nixie_spacing_from_top = 0.45;

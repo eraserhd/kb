@@ -185,10 +185,6 @@ module hammerforming_sheet_template() {
     }
 }
 
-nixie_width = 0.786;
-nixie_height = 1.165;
-nixie_depth = 1.05;
-nixie_spacing = 0.1;
 module nixie() {
     translate([0, +nixie_depth/2, +nixie_height/2])
     intersection() {
@@ -197,8 +193,7 @@ module nixie() {
 }
 
 module display() {
-    spacing_from_top = 0.45;
-    nixie_bottom = height - nixie_height - top_height - spacing_from_top;
+    nixie_bottom = height - nixie_height - top_height - nixie_spacing_from_top;
     echo("NIXIE BOTTOM:", nixie_bottom);
     translate([0, 0, nixie_bottom]) {
         nixie();
