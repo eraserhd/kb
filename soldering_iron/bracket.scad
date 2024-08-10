@@ -72,6 +72,15 @@ module nixie_clearance() {
 baseplate();
 translate([0,0,5 - 1/4]) %baseplate();
 
-translate([0,1.8,1/4]) rotate([0,0,90]) transformer_mount(show_transformer=true);
+//translate([0,1.8,1/4]) rotate([0,0,90]) transformer_mount(show_transformer=true);
+
+translate([0.45,+1.38/2 + 5/8 + 1.1,4.19/2 + 1/4])
+color("lightblue") cube([2.19, 1.38, 4.19], center=true);
+
+translate([0,1.0/2 +5/8,3.0/2 +1/4])
+color("lightgreen") cube([3.0,1.0,3.0], center=true);
+
+translate([-1.1,2.45,1/4 + 1.79/2])
+color("darkgreen") cube([0.71, 1.47, 1.79], center=true);
 
 nixie_clearance();
