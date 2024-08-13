@@ -16,6 +16,9 @@
           ]) ++ (with pkgs; [
             avrdude
           ]);
+          buildInputs = with pkgs.pkgsCross.avr; [
+            libcCross
+          ];
         };
     });
 }
