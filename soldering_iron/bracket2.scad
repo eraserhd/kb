@@ -19,7 +19,8 @@ module boost(pos) {
         cylinder(h=6, d=6.75);
     }
     module standoff_hole() {
-        translate([0,0,-0.5])cylinder(h=7, d=3);
+        translate([0,0,-0.5]) cylinder(h=7, d=3.35);
+        translate([0,0,-0.01]) cylinder(h=1, d1=4.25, d2=3.35);
     }
     module at_standoffs() {
         translate(pos)
