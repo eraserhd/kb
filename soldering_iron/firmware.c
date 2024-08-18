@@ -1,10 +1,12 @@
 #define F_CPU 1000000UL
 
+#include <avr/eeprom.h>
 #include <avr/interrupt.h>
 #include <avr/io.h>
 #include <util/delay.h>
 
 #define DEBOUNCE_MS  50
+#define TEMPERATURE_EEPROM_ADDRESS ((uint16_t*)0)
 
 enum
 {
@@ -24,7 +26,8 @@ typedef struct mode_state_tag
 }
 mode_state_t;
 
-volatile mode_state_t mode_state = {
+volatile mode_state_t mode_state =
+{
     .mode = MODE_RUN,
     .current_temperature = 0,
     .set_temperature = 300,
@@ -65,6 +68,16 @@ static uint32_t millis(void)
     return result;
 }
 
+static uint16_t read_temperature_from_eeprom(void)
+{
+    return eeprom_read_word(TEMPERATURE_EEPROM_ADDRESS);
+}
+
+static void write_temperature_to_eeprom(uint16_t temp)
+{
+    eeprom_update_word(TEMPERATURE_EEPROM_ADDRESS, temp);
+}
+
 static void init_buttons(void)
 {
     DDRB &= ~((1 << 6) | (1 << 7));
@@ -94,6 +107,7 @@ ISR(PCINT0_vect)
             break;
         case MODE_STORE_THEN_RUN:
             mode_state.set_temperature = mode_state.next_temperature;
+            write_temperature_to_eeprom(mode_state.set_temperature);
             mode_state.mode = MODE_RUN;
             break;
         }
@@ -204,6 +218,7 @@ int main(void)
     init_millisecond_timer();
     init_temperature_sensor();
     init_heater();
+    mode_state.set_temperature = read_temperature_from_eeprom();
     sei();
 
     while (1)
