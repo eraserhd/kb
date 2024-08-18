@@ -70,12 +70,12 @@ module bracket2() {
             translate([0,+board_height/2,0]) arm(width=board_width);
             
             translate([
-                board_width/2 - 26/2 - cutoff_for_brass_rings/2,
+                board_width/2 - 26/2 + 6.5/2 - cutoff_for_brass_rings/2,
                 -board_height/2,
                 0
             ])
             rotate([0,0,180])
-            arm(width=26-cutoff_for_brass_rings);
+            arm(width=26-cutoff_for_brass_rings-6.5);
         }
         
         translate([
@@ -90,6 +90,9 @@ module bracket2() {
             0
         ])
         cube(cutoff_for_brass_rings,center=true);
+        
+        translate([-board_width/2+21.5,-board_height/2+15,-0.1])
+        cylinder(h=2.2,d1=3.1,d2=5.5);
     }
 }
 
