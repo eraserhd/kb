@@ -145,6 +145,32 @@ ISR(ADC_vect)
     ADCSRA |= (1 << ADSC);
 }
 
+static void init_heater(void)
+{
+    // Set PB1 as output
+    DDRB |= (1 << PB1);
+
+    // Set Timer1 to Phase and Frequency Correct PWM mode
+    TCCR1B |= (1 << WGM13);
+
+    // Set OC1A (PB1) to non-inverting mode
+    TCCR1A |= (1 << COM1A1);
+
+    // Set prescaler to 1
+    TCCR1B |= (1 << CS10);
+
+    // Set TOP value for 16-bit resolution
+    ICR1 = 65535;
+
+    // Initialize OCR1A to 0 (0% duty cycle)
+    OCR1A = 0;
+}
+
+static void set_heater_duty(uint16_t duty)
+{
+    OCR1A = duty;
+}
+
 static void init_nixies(void)
 {
     DDRD = 0xFF;
@@ -177,6 +203,8 @@ int main(void)
     init_buttons();
     init_millisecond_timer();
     init_temperature_sensor();
+    init_heater();
+    sei();
 
     while (1)
     {
