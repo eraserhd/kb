@@ -15,10 +15,45 @@ enum
     MODE_LAST,
 };
 
+
 static uint8_t  mode                = MODE_RUN;
 static uint16_t current_temperature = 0;
 static uint16_t set_temperature     = 300;
 static uint16_t next_temperature    = 300;
+
+volatile uint32_t milliseconds      = 0;
+
+static void init_millisecond_timer(void)
+{
+    // Set Timer0 to CTC mode
+    TCCR0A = (1 << WGM01);
+
+    // Set prescaler to 64
+    TCCR0B = (1 << CS01) | (1 << CS00);
+
+    // Set compare value for 1ms interrupt at 1MHz clock
+    OCR0A = 15;  // (1MHz / 64 / 1000Hz) - 1
+
+    // Enable Timer0 compare interrupt
+    TIMSK0 = (1 << OCIE0A);
+}
+
+ISR(TIMER0_COMPA_vect)
+{
+    ++milliseconds;
+}
+
+static uint32_t millis(void)
+{
+    uint32_t result;
+    uint8_t oldSREG = SREG;
+
+    cli();
+    result = milliseconds;
+    SREG = oldSREG;
+
+    return result;
+}
 
 static void init_buttons(void)
 {
@@ -30,16 +65,22 @@ static void init_buttons(void)
 
 ISR(PCINT0_vect)
 {
-    ++current_temperature;
+    static uint8_t last_state = 0;
+    static uint32_t last_interrupt_time = 0;
 
-    if (PINB & (1 << PB6))
+    uint32_t current_time = millis();
+    if ((current_time - last_interrupt_time) <= DEBOUNCE_MS)
+        return;
+    last_interrupt_time = current_time;
+
+    uint8_t current_state = PINB;
+    if ((current_state & (1 << PB6)) && !(last_state & (1 << PB6)))
     {
         mode += 1;
         if (MODE_LAST == mode)
             mode = MODE_RUN;
     }
-
-    if (PINB & (1 << PB7))
+    if ((current_state & (1 << PB7)) && !(last_state & (1 << PB7)))
     {
         switch (mode)
         {
@@ -54,6 +95,7 @@ ISR(PCINT0_vect)
             break;
         }
     }
+    last_state = current_state;
 }
 
 static void init_nixies(void)
@@ -80,6 +122,7 @@ int main(void)
 {
     init_nixies();
     init_buttons();
+    init_millisecond_timer();
 
     while (1)
     {
@@ -98,7 +141,7 @@ int main(void)
             set_nixies(next_temperature);
             break;
         }
-        _delay_ms(1000);
+        _delay_ms(10);
     }
 
     return 0;
