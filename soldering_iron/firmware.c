@@ -116,6 +116,35 @@ ISR(PCINT0_vect)
     last_state = current_state;
 }
 
+static void init_temperature_sensor(void)
+{
+    DDRC &= ~(1 << PC4);
+
+    // Select ADC4 (PC4) as input
+    ADMUX = (1 << REFS0) | (1 << MUX2);  // AVCC as reference, ADC4 as input
+
+    // Enable ADC, enable ADC interrupt, set prescaler to 128
+    ADCSRA = (1 << ADEN) | (1 << ADIE) | (1 << ADPS2) | (1 << ADPS1) | (1 << ADPS0);
+
+    // Free-running mode
+    ADCSRB = 0;
+
+    // Disable digital input on ADC4
+    DIDR0 = (1 << ADC4D);
+
+    // Start the first conversion
+    ADCSRA |= (1 << ADSC);
+}
+
+ISR(ADC_vect)
+{
+    uint16_t adc_value = ADC;
+    mode_state.current_temperature = adc_value;
+
+    // Force the next?
+    ADCSRA |= (1 << ADSC);
+}
+
 static void init_nixies(void)
 {
     DDRD = 0xFF;
@@ -147,6 +176,7 @@ int main(void)
     init_nixies();
     init_buttons();
     init_millisecond_timer();
+    init_temperature_sensor();
 
     while (1)
     {
