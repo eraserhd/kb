@@ -104,15 +104,21 @@ static void init_nixies(void)
     DDRC |= 0x0F;
 }
 
-static void set_nixies(uint16_t value)
+static void set_nixies(uint16_t value, uint16_t flash_mask)
 {
     uint8_t low = ((value/10%10) << 4) | (value%10);
     uint8_t high = value/100%10;
-    if (0 == high)
+    // Blank leading zeroes, but only if we aren't trying to flash any
+    if (0 == high && 0 == flash_mask)
     {
         high = 0xF;
         if (0 == (low & 0xF0))
             low |= 0xF0;
+    }
+    if ((millis()%500) <= 250)
+    {
+        low |= flash_mask & 0xFF;
+        high |= (flash_mask & 0xF00) >> 8;
     }
     PORTD = low;
     PORTC = (PORTC & 0xF0) | high;
@@ -129,16 +135,16 @@ int main(void)
         switch (mode)
         {
         case MODE_RUN:
-            set_nixies(current_temperature);
+            set_nixies(current_temperature, 0);
             break;
         case MODE_SET_100:
-            set_nixies(next_temperature);
+            set_nixies(next_temperature, 0xF00);
             break;
         case MODE_SET_10:
-            set_nixies(next_temperature);
+            set_nixies(next_temperature, 0x0F0);
             break;
         case MODE_SET_1:
-            set_nixies(next_temperature);
+            set_nixies(next_temperature, 0x00F);
             break;
         }
         _delay_ms(10);
