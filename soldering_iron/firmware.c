@@ -12,16 +12,26 @@ enum
     MODE_SET_100,
     MODE_SET_10,
     MODE_SET_1,
-    MODE_LAST,
+    MODE_STORE_THEN_RUN,
 };
 
+typedef struct mode_state_tag
+{
+    uint8_t mode;
+    uint16_t current_temperature;
+    uint16_t set_temperature;
+    uint16_t next_temperature;
+}
+mode_state_t;
 
-static uint8_t  mode                = MODE_RUN;
-static uint16_t current_temperature = 0;
-static uint16_t set_temperature     = 300;
-static uint16_t next_temperature    = 300;
+volatile mode_state_t mode_state = {
+    .mode = MODE_RUN,
+    .current_temperature = 0,
+    .set_temperature = 300,
+    .next_temperature = 300,
+};
 
-volatile uint32_t milliseconds      = 0;
+volatile uint32_t milliseconds        = 0;
 
 static void init_millisecond_timer(void)
 {
@@ -76,22 +86,30 @@ ISR(PCINT0_vect)
     uint8_t current_state = PINB;
     if ((current_state & (1 << PB6)) && !(last_state & (1 << PB6)))
     {
-        mode += 1;
-        if (MODE_LAST == mode)
-            mode = MODE_RUN;
+        mode_state.mode += 1;
+        switch (mode_state.mode)
+        {
+        case MODE_SET_100:
+            mode_state.next_temperature = mode_state.set_temperature;
+            break;
+        case MODE_STORE_THEN_RUN:
+            mode_state.set_temperature = mode_state.next_temperature;
+            mode_state.mode = MODE_RUN;
+            break;
+        }
     }
     if ((current_state & (1 << PB7)) && !(last_state & (1 << PB7)))
     {
-        switch (mode)
+        switch (mode_state.mode)
         {
         case MODE_SET_100:
-            next_temperature = (next_temperature + 100)%1000;
+            mode_state.next_temperature = (mode_state.next_temperature + 100)%1000;
             break;
         case MODE_SET_10:
-            next_temperature = (next_temperature/100*100) + ((next_temperature + 10)%100);
+            mode_state.next_temperature = (mode_state.next_temperature/100*100) + ((mode_state.next_temperature + 10)%100);
             break;
         case MODE_SET_1:
-            next_temperature = (next_temperature/10*10) + ((next_temperature + 1)%10);
+            mode_state.next_temperature = (mode_state.next_temperature/10*10) + ((mode_state.next_temperature + 1)%10);
             break;
         }
     }
@@ -132,19 +150,23 @@ int main(void)
 
     while (1)
     {
-        switch (mode)
+        uint8_t oldSREG = SREG;
+        cli();
+        mode_state_t read_mode = mode_state;
+        SREG = oldSREG;
+        switch (read_mode.mode)
         {
         case MODE_RUN:
-            set_nixies(current_temperature, 0);
+            set_nixies(read_mode.current_temperature, 0);
             break;
         case MODE_SET_100:
-            set_nixies(next_temperature, 0xF00);
+            set_nixies(read_mode.next_temperature, 0xF00);
             break;
         case MODE_SET_10:
-            set_nixies(next_temperature, 0x0F0);
+            set_nixies(read_mode.next_temperature, 0x0F0);
             break;
         case MODE_SET_1:
-            set_nixies(next_temperature, 0x00F);
+            set_nixies(read_mode.next_temperature, 0x00F);
             break;
         }
         _delay_ms(10);
