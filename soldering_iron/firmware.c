@@ -7,6 +7,8 @@
 
 #define DEBOUNCE_MS  50
 #define TEMPERATURE_EEPROM_ADDRESS ((uint16_t*)0)
+#define OVERSAMPLE_BITS 3
+#define OVERSAMPLE_COUNT (1 << (OVERSAMPLE_BITS*2))
 
 enum
 {
@@ -153,8 +155,15 @@ static void init_temperature_sensor(void)
 
 ISR(ADC_vect)
 {
-    uint16_t adc_value = ADC;
-    mode_state.current_temperature = adc_value;
+    static uint8_t count = OVERSAMPLE_COUNT;
+    static uint16_t sum = 0;
+    sum += ADC;
+    if (--count == 0)
+    {
+        mode_state.current_temperature = (sum >> (OVERSAMPLE_BITS * 2));
+        sum = 0;
+        count = OVERSAMPLE_COUNT;
+    }
 
     // Force the next?
     ADCSRA |= (1 << ADSC);
