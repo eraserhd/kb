@@ -134,8 +134,9 @@ static void init_temperature_sensor(void)
 {
     DDRC &= ~(1 << PC4);
 
-    // Select ADC4 (PC4) as input
-    ADMUX = (1 << REFS0) | (1 << MUX2);  // AVCC as reference, ADC4 as input
+    // Select ADC4 (PC4) as input with internal 1.1V reference
+    ADMUX = (1 << REFS0) | (1 << REFS1) | (4 & 0x0F);
+    _delay_ms(1); // Let voltage settle
 
     // Enable ADC, enable ADC interrupt, set prescaler to 128
     ADCSRA = (1 << ADEN) | (1 << ADIE) | (1 << ADPS2) | (1 << ADPS1) | (1 << ADPS0);
