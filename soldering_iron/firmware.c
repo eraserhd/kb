@@ -274,7 +274,7 @@ static void set_nixies(uint16_t value, uint16_t flash_mask)
     PORTC = (PORTC & 0xF0) | high;
 }
 
-void adjust_heater_pwm(void)
+void adjust_heater_pwm(mode_state_t *mode_state)
 {
     static const float Kp = 5.0f, Ki = 0.1f, Kd = 1.0f;
 
@@ -288,10 +288,7 @@ void adjust_heater_pwm(void)
     static float previous_error = 0.0f;
     static uint32_t last_time = 0;
 
-    uint8_t oldSREG = SREG;
-    cli();
-    float error = mode_state.set_temperature - mode_state.current_temperature;
-    SREG = oldSREG;
+    float error = mode_state->set_temperature - mode_state->current_temperature;
 
     if (0 == last_time) {
         last_time = millis();
@@ -345,7 +342,7 @@ int main(void)
             set_nixies(read_mode.next_temperature, 0x00F);
             break;
         }
-        adjust_heater_pwm();
+        adjust_heater_pwm(&read_mode);
         _delay_ms(10);
     }
 
