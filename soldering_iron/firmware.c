@@ -10,6 +10,7 @@
 #define OVERSAMPLE_BITS 3
 #define OVERSAMPLE_COUNT (1 << (OVERSAMPLE_BITS*2))
 
+#define clamp(x, low, high) ( (x)<(low)?(low) : ((x)>(high)?(high):(x)) )
 
 enum
 {
@@ -273,6 +274,46 @@ static void set_nixies(uint16_t value, uint16_t flash_mask)
     PORTC = (PORTC & 0xF0) | high;
 }
 
+void adjust_heater_pwm(void)
+{
+    static const float Kp = 5.0f, Ki = 0.1f, Kd = 1.0f;
+
+    static const float A_supply_max = 4.0f; // 24V power supply rating
+    static const float R_heater = 2.5f;     // low end of heater resistance
+    static const float R_mosfet = 0.25f;    // IRF510 with gate at 5v
+    static const float A_100pct = 24.0f/(R_heater+R_mosfet);
+    static const uint16_t MAX_PWM = (uint16_t)(A_supply_max/A_100pct*65535);
+
+    static float integral = 0.0f;
+    static float previous_error = 0.0f;
+    static uint32_t last_time = 0;
+
+    uint8_t oldSREG = SREG;
+    cli();
+    float error = mode_state.set_temperature - mode_state.current_temperature;
+    SREG = oldSREG;
+
+    if (0 == last_time) {
+        last_time = millis();
+        previous_error = error;
+        return;
+    }
+
+    uint32_t now = millis();
+    float dt = (now - last_time) / 1000.0f;
+    last_time = now;
+
+    integral += error * dt;
+    integral = clamp(integral, -10000, 10000);
+
+    float output = Kp * error + Ki * integral + Kd * (error - previous_error);
+    previous_error = error;
+
+    output = clamp(output, 0, MAX_PWM);
+
+    set_heater_duty((uint16_t)output);
+}
+
 int main(void)
 {
     init_nixies();
@@ -304,6 +345,7 @@ int main(void)
             set_nixies(read_mode.next_temperature, 0x00F);
             break;
         }
+        adjust_heater_pwm();
         _delay_ms(10);
     }
 
