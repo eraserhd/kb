@@ -1,3 +1,5 @@
+$fn = 50;
+
 module add_trackball_socket(
     placement_matrix,
     trackball_diameter = 34,
@@ -8,7 +10,8 @@ module add_trackball_socket(
     bearing_width = 2.5,
     bearing_shaft_diameter = 3,
     bearing_shaft_length = 6,
-    heat_set_insert_diameter = 2.25
+    heat_set_insert_diameter = 2.25,
+    type = "bearing",
 ) {
     bearing_clearing_width = bearing_width + 1;
     bearing_housing_width = bearing_clearing_width + 2;
@@ -150,14 +153,15 @@ module add_trackball_socket(
     }
 }
 
+rotate([180,0,0])
 add_trackball_socket([0,0,0])
     union() {
-        translate([0,0,-1.5])
-            cube([55,55,3],center=true);
-        translate([-3/2 - 55/2,0,-30/2])
-            cube([3,55,30],center=true);
-        translate([+3/2 + 55/2,0,-30/2])
-            cube([3,55,30],center=true);
-        translate([0,-3/2 - 55/2,-30/2])
-            cube([55+6,3,30],center=true);
+        //translate([0,0,-1.5])
+        //    cube([55,55,3],center=true);
+        //translate([-3/2 - 55/2,0,-30/2])
+        //    cube([3,55,30],center=true);
+        //translate([+3/2 + 55/2,0,-30/2])
+        //    cube([3,55,30],center=true);
+        //translate([0,-3/2 - 55/2,-30/2])
+        //    cube([55+6,3,30],center=true);
     }

@@ -14,6 +14,8 @@ top_control_positions = let (
   [ +outside_control_x, top_form_y_min + 1 + 1/4],
 ];
 
+function corrected_radius(r, n=0) = r / cos(180/(n == 0 ? $fn : n));
+
 module wood_base() {
     color(wood_color) {
           linear_extrude(wood_base_thickness) {
@@ -104,26 +106,30 @@ module top_form() {
     }
 }
 
-module control_plate() {
-    hull()
-    scale([0.9, 0.9, 1])
-        for (pos = upright_positions)
-            translate(pos) translate([0, 0.22, 0])
-                circle(d=1/64);
-}
-
-module top_form_template() {
-    scale([25.4,25.4,1])
+module top_form_router_template() {
+    linear_extrude(1/4 * 25.4)
+    scale([25.4,25.4,25.4])
     difference() {
         projection()
                 top_form();
         for (pos = upright_positions)
             translate(pos)
-                circle(d=1/64);
+                circle(r=corrected_radius(13/32/2 + (0.8/25.4/2)));
+        //for (pos = top_control_positions)
+        //    translate(pos)
+        //       circle(d=5/64);
+        control_plate();
+    }
+}
+
+module control_plate_template() {
+    linear_extrude(25.4/4)
+    scale([25.4,25.4,25.4])
+    difference() {
+        control_plate();
         for (pos = top_control_positions)
             translate(pos)
-               circle(d=1/64);
-        //control_plate();
+               circle(d=5/64);
     }
 }
 
@@ -202,9 +208,107 @@ module display() {
     }
 }
 
+control_plate_corners = [
+    for (pos = upright_positions)
+        [pos.x * 0.85, (pos.y + 0.3) * 0.85]
+];
+
+function vec_length(v) = sqrt(v[0] * v[0] + v[1] * v[1]);
+function normalize(v) = v / vec_length(v);
+
+function inset_point(left, p, right, dist) =
+    let(
+       v1 = normalize(left - p),
+       v2 = normalize(right - p),
+       bisector = normalize(v1 + v2),
+       angle = acos(v1 * v2),
+       inset_dist = dist / sin(angle/2)
+    )
+    p + bisector * inset_dist;
+
+function inset_points(points, dist) =
+    [ 
+    for (i = [0:len(points)-1])
+    inset_point(
+       points[(i+len(points)-1)%len(points)],
+       points[i],
+       points[(i+1)%len(points)],
+       dist
+       )
+    ];
+
+cp_m3_holes = [
+  each inset_points(control_plate_corners, 1/8),
+  [-11/25.4, 2.5],
+  [+11/25.4, 2.5]
+];
+
+module control_plate(marks = false) {
+    thickness = 1/8;
+    m3_clearance_diameter = 3/25.4;
+    button_hole_diameter = 0.647;
+    switch_hole_diameter = 0.482;
+    port_hole_diameter = 0.6;
+    
+    module mark(d) {
+    	if (marks)
+    	   cylinder(h=thickness+0.1, d=1/64);
+    	else
+    	   cylinder(h=thickness+0.1, d=d);
+    }
+
+    difference() {
+        linear_extrude(thickness)
+        polygon(points=control_plate_corners);
+
+        for (p = cp_m3_holes)
+        translate(p)
+        translate([0,0,-0.05])
+        mark(d=m3_clearance_diameter);
+
+        translate([-1,1.375,-0.05]) mark(d=button_hole_diameter);
+        translate([0,1.375,-0.05]) mark(d=button_hole_diameter);
+        translate([+1,1.375,-0.05]) mark(d=switch_hole_diameter);
+        
+        //translate([0 - 11/25.4,2.5,-0.05]) mark(d=m3_clearance_diameter);
+        translate([0,2.5,-0.05]) mark(d=port_hole_diameter);
+        //translate([0 + 11/25.4,2.5,-0.05]) mark(d=m3_clearance_diameter);
+    }
+}
+
+module soft_jaws() {
+   difference() {
+   cube([3, 3 - 2.2 - 0.2, 1/4],center = true);
+   
+   translate([0,-3.25,0])
+   linear_extrude(1/4 + 0.1)
+   polygon(points=control_plate_corners);
+   
+   }
+}
+
 //case();
 //transformer();
 //display();
 //bottom_template();
-top_form_template();
-//control_plate();
+//top_form_router_template();
+//control_plate_template();
+
+scale([25.4,25.4,25.4])
+scale([86.36/86.25, 86.36/86.25,1])
+projection()
+control_plate(marks=true);
+
+//scale([25.4,25.4,25.4])
+//soft_jaws();
+
+min_x = min([for (p = control_plate_corners) p.x]);
+min_y = min([for (p = control_plate_corners) p.y]);
+adj_m3_holes = [for (p = cp_m3_holes) [p.x-min_x, p.y-min_y]];
+
+// 
+echo("DRILL M3:", adj_m3_holes);
+echo("DRILL 0.482:", [[1-min_x,1.375-min_y]]);
+echo("DRILL 0.6:", [[0-min_x,2.5-min_y]]); 
+echo("DRILL 0.647:", [[-1-min_x,1.375-min_y], [0-min_x,1.375-min_y]]);
+

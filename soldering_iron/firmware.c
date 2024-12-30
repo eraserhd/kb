@@ -10,6 +10,7 @@
 #define OVERSAMPLE_BITS 3
 #define OVERSAMPLE_COUNT (1 << (OVERSAMPLE_BITS*2))
 
+
 enum
 {
     MODE_RUN     = 0,
@@ -36,7 +37,7 @@ volatile mode_state_t mode_state =
     .next_temperature = 300,
 };
 
-volatile uint32_t milliseconds        = 0;
+volatile uint32_t milliseconds = 0;
 
 static void init_millisecond_timer(void)
 {
@@ -160,7 +161,58 @@ ISR(ADC_vect)
     sum += ADC;
     if (--count == 0)
     {
-        mode_state.current_temperature = (sum >> (OVERSAMPLE_BITS * 2));
+        // 27  = 53.93x + b  (R = 53.93 Ohms at 27 C)
+        // 525 = 223.7x + b  (R = 223.7 Ohms at 525 C)
+        // --
+        // 27 - 525 = 53.93x - 223.7x
+        // -498 = -169.77x
+        // 2.933 = x
+
+        // 27 = 53.93 * 2.933 + b
+        // 27 - 158.18 = b
+        // -131.18 = b
+
+        // So C = 2.933R - 131.18
+
+        // 1000 ohms on top resistor, R on the bottom resistor, and we
+        // are measuring steps from GND to 1.1v (the top resistor is connected
+
+        // V = 5(R / (1000+R))  (FIXME: actual voltage is 4.9#?)
+        // V/5 = R/(1000+R)
+        // x = V/5; x = R/(1000+R)
+        // x = v/5; x(1000+R) = R
+        // x = v/5; 1000x+Rx = R
+        // x = v/5; 1000x = R - Rx
+        // x = v/5; 1000x = R(1-x)
+        // x = v/5; 1000x/(1-x) = R
+        // 1000(v/5)/(1-v/5) = R
+
+        // A = (V/1.1)*1024
+        // A/1024 = V/1.1
+        // 11*(A/10240) = V
+        // V = A*(11/10240)
+
+        // C = 2.933 * ((A*(11/10240))/5) / (1-(A*(11/10240))/5) - 131
+        // C = 2.933 * (A*(11/51200)) / (1-(A*(11/51200))) - 131
+
+        // A / 1024 / 1.1 = R / (1000+R), so
+        // R = 1000 * (A / 1024 / 1.1) / (1 - (A / 1024 / 1.1))
+        // R = (1000 * A) / (1024 * 1.1 * (1 - A / 1024 / 1.1))
+        // R = (1000 * A) / (1024 * 1.1 - A)
+        // R = (1000 * A) / (1126.4 - A)
+
+        // Combining the equations:
+        // C = 2.933(1000*A/(1126.4 - A)) - 131.18
+        // C = 2933*A/(1126.4 - A) - 131
+
+        uint16_t A = sum >> (OVERSAMPLE_BITS * 2);
+        float V = A*11/10240.0;
+        float R = 1000.0*(V/5.0)/(1.0-V/5.0);
+        float C = 2.933*R - 131.18;
+
+        mode_state.current_temperature = C;
+
+        //mode_state.current_temperature = 2933*((uint32_t)A)/(1126 - A) - 131;
         sum = 0;
         count = OVERSAMPLE_COUNT;
     }
