@@ -278,7 +278,7 @@ static void set_nixies(uint16_t value, uint16_t flash_mask)
 
 void adjust_heater_pwm(mode_state_t *mode_state)
 {
-    static const float Kp = 0.01025f, Ki = 0.0f, Kd = 0.0f;
+    static const float Kp = 0.015125f, Ki = 0.0f, Kd = 0.0f;
 
     static const float A_supply_max = 4.0f; // 24V power supply rating
     static const float R_heater = 3.3f;     // low end of heater resistance
