@@ -279,6 +279,12 @@ void adjust_heater_pwm(mode_state_t *mode_state)
 {
     static const float Kp = 0.01025f, Ki = 0.0f, Kd = 0.0f;
 
+    static const float A_supply_max = 4.0f; // 24V power supply rating
+    static const float R_heater = 3.3f;     // low end of heater resistance
+    static const float R_mosfet = 0.25f;    // IRF510 with gate at 5v
+    static const float A_100pct = 24.0f/(R_heater+R_mosfet);
+    static const float MAX_PWM = A_supply_max/A_100pct*65535;
+
     static float integral = 0.0f;
     static float previous_error = 0.0f;
     static uint32_t last_time = 0;
@@ -299,10 +305,10 @@ void adjust_heater_pwm(mode_state_t *mode_state)
     integral = clamp(integral, -10000, 10000);
 
     float derivative = error - previous_error;
-    float output = (Kp * error + Ki * integral + Kd * derivative) * 65535.0f;
+    float output = (Kp * error + Ki * integral + Kd * derivative) * MAX_PWM;
     previous_error = error;
 
-    set_heater_duty((uint16_t)clamp(output, 0, 65535.0f));
+    set_heater_duty((uint16_t)clamp(output, 0, MAX_PWM));
 }
 
 int main(void)
