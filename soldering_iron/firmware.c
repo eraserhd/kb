@@ -10,8 +10,21 @@
 #define OVERSAMPLE_BITS 3
 #define OVERSAMPLE_COUNT (1 << (OVERSAMPLE_BITS*2))
 
+#define min(x,y) ((x)<(y)?(x):(y))
 #define max(x,y) ((x)>(y)?(x):(y))
-#define clamp(x, low, high) ( (x)<(low)?(low) : ((x)>(high)?(high):(x)) )
+#define clamp(x,low,high) min(max((x),(low)),(high))
+
+// Heater PID parameters
+#define Kp 0.015125f
+#define Ki 0.0f
+#define Kd 0.0f
+
+#define A_supply_rating 4.0f  // 24V power supply rating
+#define A_supply_max    (A_supply_rating - 0.25f)
+#define R_heater_25     3.3f  // low end of heater resistance
+#define R_mosfet        0.25f // IRF510 with gate at 5v
+#define A_100pct_duty   (24.0f/(R_heater_25+R_mosfet))
+#define MAX_DUTY        min(1.0f, A_supply_max/A_100pct_duty)
 
 enum
 {
@@ -278,13 +291,7 @@ static void set_nixies(uint16_t value, uint16_t flash_mask)
 
 void adjust_heater_pwm(mode_state_t *mode_state)
 {
-    static const float Kp = 0.015125f, Ki = 0.0f, Kd = 0.0f;
-
-    static const float A_supply_max = 4.0f; // 24V power supply rating
-    static const float R_heater = 2.8f;     // low end of heater resistance
-    static const float R_mosfet = 0.25f;    // IRF510 with gate at 5v
-    static const float A_100pct = 24.0f/(R_heater+R_mosfet);
-    static const float OUTPUT_SCALE = A_supply_max/A_100pct*65535;
+    static const float OUTPUT_SCALE = MAX_DUTY*65535.0f;
 
     static float integral = 0.0f;
     static float previous_error = 0.0f;
