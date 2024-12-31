@@ -9,7 +9,7 @@
 #define TEMPERATURE_EEPROM_ADDRESS ((uint16_t*)0)
 #define OVERSAMPLE_BITS 3
 #define OVERSAMPLE_COUNT (1 << (OVERSAMPLE_BITS*2))
-#define EMA_FACTOR 0.5
+#define EMA_FACTOR 0.8
 
 #define min(x,y) ((x)<(y)?(x):(y))
 #define max(x,y) ((x)>(y)?(x):(y))
@@ -305,10 +305,9 @@ void adjust_heater_pwm(mode_state_t *mode_state)
     static float previous_error = 0.0f;
     static uint32_t last_time = 0;
 
-    // Add 1/2 degree to set temperature so we try to stay right in
-    // the middle of that degree insted of on the edge, causing the
-    // display to flicker more.
-    float error = (float)mode_state->set_temperature + 0.5f - mode_state->current_temperature;
+    // Add a fraction of a degree to set_temperature so we stay away from
+    // the "edge" between degrees, to reduce some display flicker.
+    float error = (float)mode_state->set_temperature + 0.7f - mode_state->current_temperature;
 
     if (0 == last_time) {
         last_time = mode_state->milliseconds;
