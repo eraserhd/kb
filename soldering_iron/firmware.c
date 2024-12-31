@@ -38,7 +38,7 @@ enum
 typedef struct mode_state_tag
 {
     uint8_t mode;
-    uint16_t current_temperature;
+    float current_temperature;
     uint16_t set_temperature;
     uint16_t next_temperature;
     uint32_t milliseconds;
@@ -48,7 +48,7 @@ mode_state_t;
 volatile mode_state_t mode_state =
 {
     .mode = MODE_RUN,
-    .current_temperature = 0,
+    .current_temperature = 0.0f,
     .set_temperature = 300,
     .next_temperature = 300,
     .milliseconds = 0,
@@ -296,7 +296,7 @@ void adjust_heater_pwm(mode_state_t *mode_state)
     static float previous_error = 0.0f;
     static uint32_t last_time = 0;
 
-    float error = mode_state->set_temperature - mode_state->current_temperature;
+    float error = (float)mode_state->set_temperature - mode_state->current_temperature;
 
     if (0 == last_time) {
         last_time = mode_state->milliseconds;
@@ -337,7 +337,7 @@ int main(void)
         switch (read_mode.mode)
         {
         case MODE_RUN:
-            set_nixies(read_mode.current_temperature, 0);
+            set_nixies((uint16_t)read_mode.current_temperature, 0);
             break;
         case MODE_SET_100:
             set_nixies(read_mode.next_temperature, 0xF00);
