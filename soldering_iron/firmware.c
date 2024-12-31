@@ -9,6 +9,7 @@
 #define TEMPERATURE_EEPROM_ADDRESS ((uint16_t*)0)
 #define OVERSAMPLE_BITS 3
 #define OVERSAMPLE_COUNT (1 << (OVERSAMPLE_BITS*2))
+#define EMA_FACTOR 0.5
 
 #define min(x,y) ((x)<(y)?(x):(y))
 #define max(x,y) ((x)>(y)?(x):(y))
@@ -39,6 +40,7 @@ typedef struct mode_state_tag
 {
     uint8_t mode;
     float current_temperature;
+    float moving_temperature_average;
     uint16_t set_temperature;
     uint16_t next_temperature;
     uint32_t milliseconds;
@@ -49,6 +51,7 @@ volatile mode_state_t mode_state =
 {
     .mode = MODE_RUN,
     .current_temperature = 0.0f,
+    .moving_temperature_average = 0.0f,
     .set_temperature = 300,
     .next_temperature = 300,
     .milliseconds = 0,
@@ -72,6 +75,12 @@ static void init_millisecond_timer(void)
 ISR(TIMER0_COMPA_vect)
 {
     ++mode_state.milliseconds;
+    if (mode_state.milliseconds % 250 == 0)
+    {
+        mode_state.moving_temperature_average =
+            EMA_FACTOR * mode_state.moving_temperature_average +
+            (1.0 - EMA_FACTOR) * mode_state.current_temperature;
+    }
 }
 
 static uint32_t millis(void)
@@ -340,7 +349,7 @@ int main(void)
         switch (read_mode.mode)
         {
         case MODE_RUN:
-            set_nixies((uint16_t)read_mode.current_temperature, 0);
+            set_nixies((uint16_t)read_mode.moving_temperature_average, 0);
             break;
         case MODE_SET_100:
             set_nixies(read_mode.next_temperature, 0xF00);
