@@ -15,7 +15,7 @@
 #define clamp(x,low,high) min(max((x),(low)),(high))
 
 // Heater PID parameters
-#define Kp 0.015125f
+#define Kp 0.5f
 #define Ki 0.0f
 #define Kd 0.0f
 
