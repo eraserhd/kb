@@ -17,7 +17,7 @@
 // Heater PID parameters
 #define Kp 0.5f
 #define Ki 0.001f
-#define Kd 0.0f
+#define Kd -0.05f
 
 #define A_supply_rating 4.0f  // 24V power supply rating
 #define A_supply_max    (A_supply_rating - 0.25f)
@@ -314,7 +314,7 @@ void adjust_heater_pwm(mode_state_t *mode_state)
     if (-5.0 < error && error < 5.0)
         integral += error * dt;
 
-    float derivative = error - previous_error;
+    float derivative = (error - previous_error) / dt;
     float output = (Kp * error + Ki * integral + Kd * derivative) * OUTPUT_SCALE;
     previous_error = error;
 
