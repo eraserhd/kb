@@ -75,7 +75,8 @@ static uint32_t millis(void)
 
 static uint16_t read_temperature_from_eeprom(void)
 {
-    return eeprom_read_word(TEMPERATURE_EEPROM_ADDRESS);
+    uint16_t result = eeprom_read_word(TEMPERATURE_EEPROM_ADDRESS);
+    return 0xFFFF == result ? 300 : result;
 }
 
 static void write_temperature_to_eeprom(uint16_t temp)
