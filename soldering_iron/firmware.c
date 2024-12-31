@@ -41,6 +41,7 @@ typedef struct mode_state_tag
     uint16_t current_temperature;
     uint16_t set_temperature;
     uint16_t next_temperature;
+    uint32_t milliseconds;
 }
 mode_state_t;
 
@@ -50,9 +51,8 @@ volatile mode_state_t mode_state =
     .current_temperature = 0,
     .set_temperature = 300,
     .next_temperature = 300,
+    .milliseconds = 0,
 };
-
-volatile uint32_t milliseconds = 0;
 
 static void init_millisecond_timer(void)
 {
@@ -71,7 +71,7 @@ static void init_millisecond_timer(void)
 
 ISR(TIMER0_COMPA_vect)
 {
-    ++milliseconds;
+    ++mode_state.milliseconds;
 }
 
 static uint32_t millis(void)
@@ -80,7 +80,7 @@ static uint32_t millis(void)
     uint8_t oldSREG = SREG;
 
     cli();
-    result = milliseconds;
+    result = mode_state.milliseconds;
     SREG = oldSREG;
 
     return result;
@@ -299,12 +299,12 @@ void adjust_heater_pwm(mode_state_t *mode_state)
     float error = mode_state->set_temperature - mode_state->current_temperature;
 
     if (0 == last_time) {
-        last_time = millis();
+        last_time = mode_state->milliseconds;
         previous_error = error;
         return;
     }
 
-    uint32_t now = millis();
+    uint32_t now = mode_state->milliseconds;
     float dt = max((now - last_time) / 1000.0f, 1.0f);
     last_time = now;
 
