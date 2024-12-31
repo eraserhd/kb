@@ -296,7 +296,10 @@ void adjust_heater_pwm(mode_state_t *mode_state)
     static float previous_error = 0.0f;
     static uint32_t last_time = 0;
 
-    float error = (float)mode_state->set_temperature - mode_state->current_temperature;
+    // Add 1/2 degree to set temperature so we try to stay right in
+    // the middle of that degree insted of on the edge, causing the
+    // display to flicker more.
+    float error = (float)mode_state->set_temperature + 0.5f - mode_state->current_temperature;
 
     if (0 == last_time) {
         last_time = mode_state->milliseconds;
@@ -308,8 +311,8 @@ void adjust_heater_pwm(mode_state_t *mode_state)
     float dt = max((now - last_time) / 1000.0f, 1.0f);
     last_time = now;
 
-    integral += error * dt;
-    integral = clamp(integral, -10000, 10000);
+    if (-5.0 < error && error < 5.0)
+        integral += error * dt;
 
     float derivative = error - previous_error;
     float output = (Kp * error + Ki * integral + Kd * derivative) * OUTPUT_SCALE;
