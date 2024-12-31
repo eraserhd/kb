@@ -102,7 +102,6 @@ static void init_buttons(void)
     DDRB &= ~((1 << 6) | (1 << 7));
     PCICR |= (1 << PCIE0);
     PCMSK0 |= (1 << PCINT6) | (1 << PCINT7);
-    sei();
 }
 
 ISR(PCINT0_vect)
@@ -306,7 +305,7 @@ void adjust_heater_pwm(mode_state_t *mode_state)
     }
 
     uint32_t now = millis();
-    float dt = max((now - last_time) / 1000.0f, 1.0);
+    float dt = max((now - last_time) / 1000.0f, 1.0f);
     last_time = now;
 
     integral += error * dt;
