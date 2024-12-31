@@ -16,7 +16,7 @@
 
 // Heater PID parameters
 #define Kp 0.5f
-#define Ki 0.0f
+#define Ki 0.001f
 #define Kd 0.0f
 
 #define A_supply_rating 4.0f  // 24V power supply rating
