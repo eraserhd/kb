@@ -21,12 +21,15 @@
 #define Ki 0.003f
 #define Kd -0.05f
 
-#define A_supply_rating 4.0f  // 24V power supply rating
-#define A_supply_max    (A_supply_rating - 0.25f)
-#define R_heater_25     3.3f  // low end of heater resistance
-#define R_mosfet        0.25f // IRF510 with gate at 5v
-#define A_100pct_duty   (24.0f/(R_heater_25+R_mosfet))
-#define MAX_DUTY        min(1.0f, A_supply_max/A_100pct_duty)
+#define A_supply_rating         4.0f  // 24V power supply rating
+#define A_supply_max            (A_supply_rating - 0.25f)
+#define R_heater_25             3.3f
+#define R_heater_225            8.8f
+#define R_mosfet                0.25f // IRF510 with gate at 5v
+#define A_100PCT_DUTY(R_heater) (24.0f/((R_heater)+R_mosfet))
+#define MAX_DUTY(R_heater)      min(1.0f, A_supply_max/A_100PCT_DUTY((R_heater)))
+#define MAX_DUTY_25             MAX_DUTY(R_heater_25)
+#define MAX_DUTY_225            MAX_DUTY(R_heater_225)
 
 enum
 {
@@ -258,11 +261,14 @@ static void set_nixies(uint16_t value, uint16_t flash_mask)
 
 void adjust_heater_pwm(mode_state_t *mode_state)
 {
-    static const float OUTPUT_SCALE = MAX_DUTY*65535.0f;
+    static const float OUTPUT_SCALE = MAX_DUTY_25*65535.0f;
 
     static float integral = 0.0f;
     static float previous_error = 0.0f;
     static uint32_t last_time = 0;
+
+    if (0.0f == mode_state->current_temperature)
+        return;
 
     // Add a fraction of a degree to set_temperature so we stay away from
     // the "edge" between degrees, to reduce some display flicker.
@@ -285,7 +291,18 @@ void adjust_heater_pwm(mode_state_t *mode_state)
     float output = (Kp * error + Ki * integral + Kd * derivative) * OUTPUT_SCALE;
     previous_error = error;
 
-    set_heater_duty((uint16_t)clamp(output, 0, OUTPUT_SCALE));
+    // Since the heater resistance increases at hotter temperatures, we
+    // can increase the duty cycle at higher temperatures without tripping
+    // the supply's overcurrent protection.
+    float R_heater = interpolate(
+        mode_state->current_temperature,
+        25.0f, R_heater_25,
+        225.0f, R_heater_225
+    );
+    float max_output = MAX_DUTY(R_heater) * 65535.0f;
+    output = clamp(output, 0, max_output);
+
+    set_heater_duty((uint16_t)output);
 }
 
 int main(void)
