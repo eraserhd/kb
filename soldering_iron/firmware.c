@@ -192,11 +192,11 @@ ISR(ADC_vect)
         sum >>= OVERSAMPLE_BITS * 2;
 
         // ADC reads 240 @ 29.7C
-        // ADC reads 598 @ 285C
+        // ADC reads 598 @ 290C
         mode_state.current_temperature = interpolate(
             sum,
             240.0f, 29.7f,
-            598.0f, 285.0f
+            598.0f, 290.0f
         );
 
         sum = 0;
